@@ -216,6 +216,8 @@ The central hub that manages state and dispatches actions. Supports state regist
 ### Selectors
 Tools for creating focused, transformed views of your state without duplicating data.
 
-## License
+## Roadmap
 
-[Add your license information here]
+- [] Update Selectors to derive bindings explicitly
+- [] Fully implement all action types
+
