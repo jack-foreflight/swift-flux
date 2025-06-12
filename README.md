@@ -25,7 +25,7 @@ Add SwiftFlux to your project via Xcode or by adding it to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/your-username/swift-flux.git", from: "1.0.0")
+    .package(url: "https://github.com/jack-foreflight/swift-flux.git", from: "1.0.0")
 ]
 ```
 
