@@ -39,13 +39,8 @@ struct ContentView: View {
 
     var body: some View {
         TabView(
-            selection: Binding(
-                // Binding the tab selection to our navigation state
-                get: { store.state.navigation.selectedTab },
-                set: { newTab in
-                    store.dispatch(SelectTabAction(tab: newTab))
-                }
-            )
+            // Binding the tab selection to our navigation state
+            selection: store.bind(\.navigation.selectedTab, to: SelectTabAction.init)
         ) {
             // Counter Tab
             CounterView()
@@ -74,10 +69,7 @@ struct ContentView: View {
         // Show error alerts when they occur
         .alert(
             "Error",
-            isPresented: Binding<Bool>(
-                get: { store.state.loading.lastError != nil },
-                set: { _ in store.dispatch(ClearErrorAction()) }
-            )
+            isPresented: store.bind { $0.loading.lastError != nil } to: { _ in ClearErrorAction() }
         ) {
             Button("OK") {
                 store.dispatch(ClearErrorAction())

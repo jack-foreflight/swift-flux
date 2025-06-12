@@ -194,10 +194,7 @@ struct CounterView: View {
         }
         // Present history sheet
         .sheet(
-            isPresented: Binding<Bool>(
-                get: { store.state.navigation.isHistoryPresented },
-                set: { _ in store.dispatch(ToggleHistoryAction()) }
-            )
+            isPresented: store.bind(\.navigation.isHistoryPresented, to: ToggleHistoryAction())
         ) {
             HistoryDetailView(store: store)
         }

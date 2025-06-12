@@ -2,6 +2,15 @@
 
 A modern Swift implementation of the Flux architecture pattern, leveraging Swift's Observation framework for reactive state management in iOS and macOS applications.
 
+## Why Swift Flux
+
+- **Simple**: Includes only 3 main building blocks that effectively divide responsibilities within an app
+- **Light Weight**: Includes only 9 swift files in the base package
+- **Straight Forward**: Data flow pattern that is easy to reason about
+- **Native**: All code aligns with native SwiftUI paradigms and compliments rather than contradicts SwiftUI
+- **Separations**: Clearly separates Command and Query responsibilities to ensure uni-directional flow of data
+- **Extensible**: The vanilla package offers tools that allows you to easily extend the behavior of any single component in the Architecture
+
 ## Features
 
 - **Observable State Management**: Built on Swift's Observation framework for automatic UI updates
@@ -218,6 +227,8 @@ Tools for creating focused, transformed views of your state without duplicating 
 
 ## Roadmap
 
-- [] Update Selectors to derive bindings explicitly
-- [] Fully implement all action types
+- [ ] Dynamically infer type from each property on an AppState
+- [x] Update Selectors to derive bindings explicitly
+- [ ] Additional action types and traits
+- [ ] ActionHandler middleware implementation
 

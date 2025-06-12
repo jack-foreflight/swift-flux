@@ -55,10 +55,7 @@ struct SettingsView: View {
 
                 Toggle(
                     "Enable Animations",
-                    isOn: Binding<Bool>(
-                        get: { store.state.preferences.animationsEnabled },
-                        set: { _ in store.dispatch(ToggleAnimationsAction()) }
-                    ))
+                    isOn: store.bind(\.preferences.animationsEnabled, to: ToggleAnimationsAction()))
             }
 
             // Sound toggle
@@ -69,10 +66,7 @@ struct SettingsView: View {
 
                 Toggle(
                     "Enable Sound",
-                    isOn: Binding<Bool>(
-                        get: { store.state.preferences.soundEnabled },
-                        set: { _ in store.dispatch(ToggleSoundAction()) }
-                    ))
+                    isOn: store.bind(\.preferences.soundEnabled, to: ToggleSoundAction()))
             }
 
             // Theme picker
@@ -83,10 +77,7 @@ struct SettingsView: View {
 
                 Picker(
                     "Theme",
-                    selection: Binding<Theme>(
-                        get: { store.state.preferences.theme },
-                        set: { newTheme in store.dispatch(SetThemeAction(theme: newTheme)) }
-                    )
+                    selection: store.bind(\.preferences.theme, to: SetThemeAction.init)
                 ) {
                     ForEach(Theme.allCases, id: \.self) { theme in
                         Text(theme.rawValue).tag(theme)
@@ -122,10 +113,7 @@ struct SettingsView: View {
                 Text("Step Size")
                 Spacer()
                 Stepper(
-                    value: Binding<Int>(
-                        get: { store.state.counter.stepSize },
-                        set: { newValue in store.dispatch(SetStepSizeAction(stepSize: newValue)) }
-                    ),
+                    value: store.bind(\.counter.stepSize, to: SetStepSizeAction.init),
                     in: 1...100
                 ) {
                     Text("\(store.state.counter.stepSize)")
@@ -149,10 +137,7 @@ struct SettingsView: View {
                 Spacer()
 
                 Stepper(
-                    value: Binding<Int>(
-                        get: { store.state.preferences.maxHistoryItems },
-                        set: { newValue in store.dispatch(SetMaxHistoryItemsAction(maxItems: newValue)) }
-                    ),
+                    value: store.bind(\.preferences.maxHistoryItems, to: SetMaxHistoryItemsAction.init),
                     in: 5...50
                 ) {
                     Text("\(store.state.preferences.maxHistoryItems)")
