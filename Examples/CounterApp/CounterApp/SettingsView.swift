@@ -12,7 +12,7 @@ import SwiftUI
 /// A view for managing app settings and preferences.
 /// This demonstrates preference management with SwiftFlux.
 struct SettingsView: View {
-    var store: Store<CounterAppState>
+    @Environment(Store<CounterAppState>.self) var store
 
     var body: some View {
         NavigationView {
@@ -310,5 +310,5 @@ struct StateDebugRow: View {
 // MARK: - Preview
 
 #Preview {
-    SettingsView(store: Store(CounterAppState()))
+    SettingsView().environment(Store(CounterAppState()))
 }

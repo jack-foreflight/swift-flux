@@ -20,7 +20,8 @@ struct CounterApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView(store: store)
+            ContentView()
+                .environment(store)
                 // Load saved data when the app starts
                 .task {
                     store.dispatch(LoadDataAction())
@@ -34,7 +35,7 @@ struct CounterApp: App {
 struct ContentView: View {
     /// Access the store via explicit dependency injection.
     /// This demonstrates explicit dependency passing instead of Environment.
-    var store: Store<CounterAppState>
+    @Environment(Store<CounterAppState>.self) var store
 
     var body: some View {
         TabView(
@@ -47,7 +48,7 @@ struct ContentView: View {
             )
         ) {
             // Counter Tab
-            CounterView(store: store)
+            CounterView()
                 .tabItem {
                     Image(systemName: "plus.minus")
                     Text("Counter")
@@ -55,7 +56,7 @@ struct ContentView: View {
                 .tag(AppTab.counter)
 
             // History Tab
-            HistoryView(store: store)
+            HistoryView()
                 .tabItem {
                     Image(systemName: "clock")
                     Text("History")
@@ -63,7 +64,7 @@ struct ContentView: View {
                 .tag(AppTab.history)
 
             // Settings Tab
-            SettingsView(store: store)
+            SettingsView()
                 .tabItem {
                     Image(systemName: "gear")
                     Text("Settings")
