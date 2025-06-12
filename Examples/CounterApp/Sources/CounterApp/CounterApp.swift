@@ -1,0 +1,88 @@
+//
+//  CounterApp.swift
+//  CounterApp - SwiftFlux Example
+//
+//  This is the main app entry point that demonstrates how to set up
+//  a SwiftFlux store and provide it to your SwiftUI view hierarchy.
+//
+
+import SwiftFlux
+import SwiftUI
+
+/// The main app structure.
+/// This demonstrates how to initialize and provide a SwiftFlux store to your app.
+@main
+struct CounterApp: App {
+    /// The main store for our application.
+    /// In SwiftFlux, you typically have one store per app that manages all state.
+    /// The @State property wrapper ensures the store is preserved across view updates.
+    @State private var store = Store(CounterAppState())
+
+    var body: some Scene {
+        WindowGroup {
+            ContentView(store: store)
+                // Load saved data when the app starts
+                .task {
+                    store.dispatch(LoadDataAction())
+                }
+        }
+    }
+}
+
+/// The main content view that manages the tab-based navigation.
+/// This demonstrates how to access and react to store state in SwiftUI.
+struct ContentView: View {
+    /// Access the store via explicit dependency injection.
+    /// This demonstrates explicit dependency passing instead of Environment.
+    var store: Store<CounterAppState>
+
+    var body: some View {
+        TabView(
+            selection: Binding(
+                // Binding the tab selection to our navigation state
+                get: { store.state.navigation.selectedTab },
+                set: { newTab in
+                    store.dispatch(SelectTabAction(tab: newTab))
+                }
+            )
+        ) {
+            // Counter Tab
+            CounterView(store: store)
+                .tabItem {
+                    Image(systemName: "plus.minus")
+                    Text("Counter")
+                }
+                .tag(AppTab.counter)
+
+            // History Tab
+            HistoryView(store: store)
+                .tabItem {
+                    Image(systemName: "clock")
+                    Text("History")
+                }
+                .tag(AppTab.history)
+
+            // Settings Tab
+            SettingsView(store: store)
+                .tabItem {
+                    Image(systemName: "gear")
+                    Text("Settings")
+                }
+                .tag(AppTab.settings)
+        }
+        // Show error alerts when they occur
+        .alert(
+            "Error",
+            isPresented: Binding<Bool>(
+                get: { store.state.loading.lastError != nil },
+                set: { _ in store.dispatch(ClearErrorAction()) }
+            )
+        ) {
+            Button("OK") {
+                store.dispatch(ClearErrorAction())
+            }
+        } message: {
+            Text(store.state.loading.lastError ?? "An unknown error occurred")
+        }
+    }
+}
