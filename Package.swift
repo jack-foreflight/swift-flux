@@ -9,7 +9,7 @@ let package = Package(
     platforms: [.iOS(.v17), .macOS(.v14)],
     products: [
         .library(
-            name: "SwiftFlux",
+            name: "swift-flux",
             targets: ["SwiftFlux"])
     ],
     dependencies: [

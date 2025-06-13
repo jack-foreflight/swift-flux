@@ -69,7 +69,11 @@ struct ContentView: View {
         // Show error alerts when they occur
         .alert(
             "Error",
-            isPresented: store.bind { $0.loading.lastError != nil } to: { _ in ClearErrorAction() }
+            isPresented: store.bind {
+                $0.loading.lastError != nil
+            } to: { _ in
+                ClearErrorAction()
+            }
         ) {
             Button("OK") {
                 store.dispatch(ClearErrorAction())
