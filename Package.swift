@@ -1,15 +1,15 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 5.9
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import CompilerPluginSupport
 import PackageDescription
 
 let package = Package(
-    name: "SwiftFlux",
+    name: "swift-flux",
     platforms: [.iOS(.v17), .macOS(.v14)],
     products: [
         .library(
-            name: "swift-flux",
+            name: "SwiftFlux",
             targets: ["SwiftFlux"])
     ],
     dependencies: [
