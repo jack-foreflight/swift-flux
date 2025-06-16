@@ -21,6 +21,13 @@ A modern Swift implementation of the Flux architecture pattern, leveraging Swift
 - **Async Support**: First-class support for async operations with proper task management
 - **Store Composition**: Register and manage multiple state objects within a single store
 
+## Diagram
+### Synchronous Data Flow
+![CleanShot 2025-06-16 at 12 16 20@2x](https://github.com/user-attachments/assets/8789e24a-672a-4844-81b2-607dc3b4afda)
+
+### Asynchronous Data Flow
+![CleanShot 2025-06-16 at 12 16 41@2x](https://github.com/user-attachments/assets/513d1410-26af-4b6f-a9e3-b873719b7dbb)
+
 ## Requirements
 
 - iOS 17.0+ / macOS 14.0+
