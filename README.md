@@ -21,7 +21,23 @@ A modern Swift implementation of the Flux architecture pattern, leveraging Swift
 - **Async Support**: First-class support for async operations with proper task management
 - **Store Composition**: Register and manage multiple state objects within a single store
 
-## Diagram
+## Core Concepts
+
+### AppState
+Classes conforming to `AppState` represent observable state that can be registered with a store. Use the `@AppState` macro for automatic implementation.
+
+### Actions
+- **Action**: Synchronous state mutations
+- **AsyncAction**: Asynchronous operations that can dispatch other actions
+- Both support error handling through the `failed` method
+
+### Store
+The central hub that manages state and dispatches actions. Supports state registration, action dispatching, and provides observable state access.
+
+### Selectors
+Tools for creating focused, transformed views of your state without duplicating data.
+
+## Data Flow Diagrams
 ### Synchronous Data Flow
 ![CleanShot 2025-06-16 at 12 16 20@2x](https://github.com/user-attachments/assets/8789e24a-672a-4844-81b2-607dc3b4afda)
 
@@ -215,22 +231,6 @@ SwiftFlux automatically manages async action tasks:
 // Cancel all running async actions
 store.cancelAllActions()
 ```
-
-## Core Concepts
-
-### AppState
-Classes conforming to `AppState` represent observable state that can be registered with a store. Use the `@AppState` macro for automatic implementation.
-
-### Actions
-- **Action**: Synchronous state mutations
-- **AsyncAction**: Asynchronous operations that can dispatch other actions
-- Both support error handling through the `failed` method
-
-### Store
-The central hub that manages state and dispatches actions. Supports state registration, action dispatching, and provides observable state access.
-
-### Selectors
-Tools for creating focused, transformed views of your state without duplicating data.
 
 ## Roadmap
 
