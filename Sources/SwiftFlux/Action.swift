@@ -7,93 +7,53 @@
 
 import Foundation
 
-/// A protocol representing a synchronous state mutation in the Flux architecture.
-public protocol Action {
-    /// The type of state this action operates on
-    associatedtype State: AppState
-    /// The type of error this action can produce
+public protocol Action<State, Failure> {
+    associatedtype State: SwiftFlux.AppState
     associatedtype Failure = any Error
 
-    /// Performs the main operation of this action on the given state
-    /// - Parameter state: The state object to modify
-    func operation(state: State)
-    /// Called when the action fails with an error
-    /// - Parameters:
-    ///   - error: The error that occurred
-    ///   - state: The state object at the time of failure
+    static var id: AnyHashable { get }
+    func precondition(state: State) -> Bool
+    func body(state: State) throws
     func failed(error: Failure, state: State)
+}
+
+extension Action {
+    public static var id: AnyHashable { ObjectIdentifier(Self.self) }
+    public func precondition(state: State) -> Bool { true }
 }
 
 extension Action where Failure == Never {
     public func failed(error: Never, state: State) {}
 }
 
-/// A protocol representing an asynchronous operation in the Flux architecture.
-/// 
-/// AsyncAction provides a simplified way to perform asynchronous work that may
-/// need to dispatch multiple actions or access state during execution. The action
-/// receives a Store instance that provides both state access and dispatch capabilities.
-///
-/// Example usage:
-/// ```swift
-/// struct LoadUserAction: AsyncAction {
-///     typealias State = AppState
-///     let userId: String
-///     
-///     func operation(store: Store<AppState>) async {
-///         await store.dispatch(SetLoadingAction(true))
-///         
-///         do {
-///             let user = try await userService.loadUser(id: userId)
-///             await store.dispatch(SetUserAction(user))
-///         } catch {
-///             await failed(error: error, store: store)
-///         }
-///         
-///         await store.dispatch(SetLoadingAction(false))
-///     }
-///     
-///     func failed(error: any Error, store: Store<AppState>) async {
-///         await store.dispatch(SetErrorAction(error.localizedDescription))
-///     }
-/// }
-/// ```
-public protocol AsyncAction {
-    associatedtype State: AppState
-
-    /// The type of error this action can produce
+public protocol AsyncAction<Failure> {
     associatedtype Failure = any Error
 
-    /// Performs the main asynchronous operation of this action
-    /// - Parameter store: The store providing state access and action dispatching
-    func operation(store: Store<State>) async
-    /// Called when the action fails with an error
-    /// - Parameters:
-    ///   - error: The error that occurred
-    ///   - store: The store at the time of failure
-    func failed(error: Failure, store: Store<State>) async
+    static var id: AnyHashable { get }
+    var behavior: AsyncBehavior { get }
+    var priority: TaskPriority { get }
+    func precondition(store: Store) async -> Bool
+    func body(store: Store) async throws
+    func failed(error: Failure, store: Store) async
+}
+
+public enum AsyncBehavior {
+    case none
+    case debounce(any DurationProtocol)
+    case throttle(any DurationProtocol)
+}
+
+extension AsyncAction {
+    public static var id: AnyHashable { ObjectIdentifier(Self.self) }
+    public var behavior: AsyncBehavior { .none }
+    public var priority: TaskPriority { .userInitiated }
+    public func precondition(store: Store) async -> Bool { true }
 }
 
 extension AsyncAction where Failure == Never {
-    public func failed(error: Never, store: Store<State>) async {}
+    public func failed(error: Never, store: Store) async {}
 }
 
-/// A convenience action that wraps a closure for simple state mutations.
-public struct Mutate<State: AppState>: Action {
-    private let operation: (State) -> Void
-
-    /// Creates a new mutation action with the given operation
-    /// - Parameter operation: The closure that will modify the state
-    public init(_ operation: @escaping (State) -> Void) {
-        self.operation = operation
-    }
-
-    public func operation(state: State) {
-        operation(state)
-    }
-}
-
-/// A result builder for composing multiple actions into a sequence.
 @resultBuilder
 public struct ActionBuilder {
     public static func buildBlock(_ actions: any Action...) -> [any Action] {
@@ -125,43 +85,75 @@ public struct ActionBuilder {
     }
 }
 
-// MARK: - Action Traits
+extension ActionBuilder {
+    public static func buildBlock(_ actions: any AsyncAction...) -> [any AsyncAction] {
+        actions
+    }
 
-/// Marker protocol for actions that handle their own dispatch logic
-public protocol ActionHandler {}
+    public static func buildOptional(_ action: [any AsyncAction]?) -> [any AsyncAction] {
+        action ?? []
+    }
 
-/// Marker protocol for actions that can compose other actions
-public protocol ActionComposer {}
+    public static func buildEither(first action: [any AsyncAction]) -> [any AsyncAction] {
+        action
+    }
 
-/// Marker protocol for actions that have preconditions that must be met
-public protocol PreconditionAction: Action {}
+    public static func buildEither(second action: [any AsyncAction]) -> [any AsyncAction] {
+        action
+    }
 
-/// Marker protocol for actions that can be logged for debugging or analytics
-public protocol LoggableAction: Action {}
+    public static func buildArray(_ actions: [[any AsyncAction]]) -> [any AsyncAction] {
+        actions.flatMap { $0 }
+    }
 
-/// Marker protocol for actions that can be reversed/undone
-public protocol ReversableAction: Action {}
+    public static func buildExpression(_ action: any AsyncAction) -> [any AsyncAction] {
+        [action]
+    }
 
-/// Marker protocol for actions that can be persisted to storage
-public protocol PersistableAction: Action {}
+    public static func buildExpression(_ actions: [any AsyncAction]) -> [any AsyncAction] {
+        actions
+    }
+}
 
-/// Marker protocol for actions that can be published to external systems
-public protocol PublishableAction: Action {}
+public struct Mutate<State: AppState>: Action {
+    private let body: (State) -> Void
 
-/// Marker protocol for actions that can trigger notifications
-public protocol NotifiableAction: Action {}
+    public init(_ body: @escaping (State) -> Void) {
+        self.body = body
+    }
 
-/// Marker protocol for async actions that run in isolation
-public protocol IsolatedAction: AsyncAction {}
+    public func body(state: State) {
+        body(state)
+    }
+}
 
-/// Marker protocol for async actions that can be cancelled
-public protocol CancellableAction: AsyncAction {}
+public struct Concurrent: AsyncAction {
+    private let actions: () -> [any AsyncAction]
 
-/// Marker protocol for async actions that can be debounced
-public protocol DebouncableAction: AsyncAction {}
+    init(@ActionBuilder _ actions: @escaping () -> [any AsyncAction]) {
+        self.actions = actions
+    }
 
-/// Marker protocol for async actions that can run concurrently
-public protocol ConcurrentActions: AsyncAction & ActionComposer {}
+    public func body(store: Store) async throws {
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            for action in actions() {
+                group.addTask { try await action.body(store: store) }
+            }
+            try await group.waitForAll()
+        }
+    }
+}
 
-/// Marker protocol for async actions that must run sequentially
-public protocol SequentialActions: AsyncAction & ActionComposer {}
+public struct Sequential: AsyncAction {
+    private let actions: () -> [any AsyncAction]
+
+    init(@ActionBuilder _ actions: @escaping () -> [any AsyncAction]) {
+        self.actions = actions
+    }
+
+    public func body(store: Store) async throws {
+        for action in actions() {
+            try await action.body(store: store)
+        }
+    }
+}

@@ -22,7 +22,8 @@ public struct AppStateMacro: MemberMacro {
         in context: some MacroExpansionContext
     ) throws -> [DeclSyntax] {
         guard let identifier = declaration.asProtocol(NamedDeclSyntax.self) else { return [] }
-        let className = IdentifierPatternSyntax(identifier: .init(stringLiteral: "\(identifier.name.trimmed)"))
+        let className = IdentifierPatternSyntax(
+            identifier: .init(stringLiteral: "\(identifier.name.trimmed)"))
 
         let registrar: DeclSyntax =
             """
@@ -109,20 +110,21 @@ extension AppStateMacro: ExtensionMacro {
             .compactMap { $0.decl.instanced?.identifiers }
             .flatMap { $0 }
             .compactMap { identifierPattern in
-                "(\(identifierPattern.identifier.text) as? \(module).AppState)?.register(with: registrable)"
+                "(\(identifierPattern.identifier.text) as? \(module).AppState)?.register(with: store)"
             }
 
         let stateConformance = try ExtensionDeclSyntax(
             """
             extension \(type): \(raw: module).AppState {
-                public func register(with registrable: some \(raw: module).Registrable) {
-                    registrable.register(state: self)
+                public func register(with store: \(raw: module).Store) {
+                    store.register(state: self)
                     \(raw: registrations.joined(separator: "\n"))
                 }
             }       
             """
         )
-        let observableConformance = try ExtensionDeclSyntax("extension \(type): \(raw: observation).Observable { }")
+        let observableConformance = try ExtensionDeclSyntax(
+            "extension \(type): \(raw: observation).Observable { }")
         return [observableConformance, stateConformance]
     }
 }
@@ -141,7 +143,9 @@ extension DeclSyntaxProtocol {
     var instanced: VariableDeclSyntax? {
         guard let variable else { return nil }
         let tokens = variable.modifiers.lazy.map(\.name.tokenKind)
-        guard !tokens.contains(.keyword(.static)), !tokens.contains(.keyword(.class)) else { return nil }
+        guard !tokens.contains(.keyword(.static)), !tokens.contains(.keyword(.class)) else {
+            return nil
+        }
         return variable
     }
 

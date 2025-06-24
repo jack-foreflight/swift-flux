@@ -7,89 +7,62 @@
 
 import Foundation
 
-/// A protocol for types that provide access to state via dynamic member lookup.
+public protocol Selector<State, SelectedState> {
+    associatedtype State: AppState
+    associatedtype SelectedState
+    func body(state: State) -> SelectedState
+}
+
 @dynamicMemberLookup
-public protocol Selectable<State> {
-    /// The type of state this selectable provides
-    associatedtype State
-    /// The current state value
-    @MainActor var state: State { get }
+public protocol Selection<SelectedState> {
+    associatedtype SelectedState
+    subscript<Value>(dynamicMember keyPath: KeyPath<SelectedState, Value>) -> Value { get }
+    func dispatch(_ action: some Action)
+    func dispatch(_ action: some AsyncAction)
 }
 
-/// A protocol for types that can select and transform state from a root state.
-public protocol Selector<State> {
-    /// The type of state this selector produces
-    associatedtype State
-    /// The root state type this selector operates on
-    associatedtype Root: AppState
-    /// Selects and transforms state from the root
-    /// - Parameter root: The root state to select from
-    /// - Returns: The selected/transformed state
-    @MainActor func select(root: Root) -> State
-}
+public struct Select<SelectedState>: Selection {
+    private let store: Store
+    private let state: (Store) -> SelectedState
 
-@MainActor extension Selectable {
-    public subscript<Value>(dynamicMember keyPath: KeyPath<State, Value>) -> Value {
-        state[keyPath: keyPath]
-    }
-}
-
-@MainActor extension Selectable where Self: Dispatcher {
-    public func slice<Slice>(_ keyPath: KeyPath<State, Slice>) -> SliceSelector<Self, Slice> {
-        SliceSelector(self, keyPath: keyPath)
+    init(store: Store, state: @escaping (Store) -> SelectedState) {
+        self.store = store
+        self.state = state
     }
 
-    public func map<S: Selector>(_ selector: S) -> MapSelector<Self, S.State> where State == S.Root {
-        MapSelector(self) { state in selector.select(root: state) }
-    }
-}
-
-/// A selector that provides access to a slice of state via a key path.
-@MainActor public struct SliceSelector<Store: Selectable & Dispatcher, Slice>: Selectable, Dispatcher {
-    public typealias State = Slice
-    public let root: Store
-
-    private let keyPath: KeyPath<Store.State, Slice>
-
-    public init(_ root: Store, keyPath: KeyPath<Store.State, Slice>) {
-        self.root = root
-        self.keyPath = keyPath
-    }
-
-    public var state: Slice {
-        root.state[keyPath: keyPath]
+    public subscript<Value>(dynamicMember keyPath: KeyPath<SelectedState, Value>) -> Value {
+        state(store)[keyPath: keyPath]
     }
 
     public func dispatch(_ action: some Action) {
-        root.dispatch(action)
+        store.dispatch(action)
     }
 
     public func dispatch(_ action: some AsyncAction) {
-        root.dispatch(action)
+        store.dispatch(action)
     }
 }
 
-/// A selector that transforms state using a mapping function.
-@MainActor public struct MapSelector<Store: Selectable & Dispatcher, Mapped>: Selectable, Dispatcher {
-    public typealias State = Mapped
-    public let root: Store
-
-    private let map: (Store.State) -> Mapped
-
-    public init(_ root: Store, map: @escaping (Store.State) -> Mapped) {
-        self.root = root
-        self.map = map
+extension Store {
+    public func select<State: AppState>(_ type: State.Type) -> Select<State> {
+        Select(store: self) { $0.resolve() }
     }
 
-    public var state: Mapped {
-        map(root.state)
+    public func select<Selector: SwiftFlux.Selector>(
+        _ selector: Selector
+    ) -> Select<Selector.SelectedState> {
+        Select(store: self) { selector.body(state: $0.resolve()) }
     }
 
-    public func dispatch(_ action: some Action) {
-        root.dispatch(action)
+    public func select<State: AppState, SelectedState>(
+        _ keyPath: KeyPath<State, SelectedState>
+    ) -> Select<SelectedState> {
+        Select(store: self) { $0.resolve(State.self)[keyPath: keyPath] }
     }
 
-    public func dispatch(_ action: some AsyncAction) {
-        root.dispatch(action)
+    public func select<State: AppState, SelectedState>(
+        _ map: @escaping (State) -> SelectedState
+    ) -> Select<SelectedState> {
+        Select(store: self) { map($0.resolve()) }
     }
 }

@@ -12,7 +12,8 @@ import SwiftSyntaxMacros
 @main
 struct SwiftFluxPlugin: CompilerPlugin {
     let providingMacros: [Macro.Type] = [
-        AppStateMacro.self
+        AppStateMacro.self,
+        AppEnvironmentMacro.self,
     ]
 }
 
