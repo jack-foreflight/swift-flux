@@ -8,7 +8,7 @@
 import Foundation
 
 public protocol Effect<State> {
-    associatedtype State: AppState
+    associatedtype State: SharedState
 
     func willSet(state: State)
     func didSet(state: State)

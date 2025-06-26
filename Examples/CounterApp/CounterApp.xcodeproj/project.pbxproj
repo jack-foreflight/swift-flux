@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		042320502DFB336700D03759 /* SwiftFlux in Frameworks */ = {isa = PBXBuildFile; productRef = 0423204F2DFB336700D03759 /* SwiftFlux */; };
+		0416F36D2E0B479700CAEB09 /* SwiftFlux in Frameworks */ = {isa = PBXBuildFile; productRef = 0416F36C2E0B479700CAEB09 /* SwiftFlux */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,7 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				042320502DFB336700D03759 /* SwiftFlux in Frameworks */,
+				0416F36D2E0B479700CAEB09 /* SwiftFlux in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -117,7 +117,7 @@
 			);
 			name = CounterApp;
 			packageProductDependencies = (
-				0423204F2DFB336700D03759 /* SwiftFlux */,
+				0416F36C2E0B479700CAEB09 /* SwiftFlux */,
 			);
 			productName = CounterApp;
 			productReference = 046B2DEA2DFB3270003C9EC9 /* CounterApp.app */;
@@ -202,7 +202,7 @@
 			mainGroup = 046B2DE12DFB3270003C9EC9;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				0423204E2DFB336700D03759 /* XCLocalSwiftPackageReference "../../../swift-flux" */,
+				0416F36B2E0B479700CAEB09 /* XCLocalSwiftPackageReference "../../../swift-flux" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 046B2DEB2DFB3270003C9EC9 /* Products */;
@@ -425,7 +425,7 @@
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				XROS_DEPLOYMENT_TARGET = 2.2;
 			};
@@ -464,7 +464,7 @@
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				XROS_DEPLOYMENT_TARGET = 2.2;
 			};
@@ -602,14 +602,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		0423204E2DFB336700D03759 /* XCLocalSwiftPackageReference "../../../swift-flux" */ = {
+		0416F36B2E0B479700CAEB09 /* XCLocalSwiftPackageReference "../../../swift-flux" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = "../../../swift-flux";
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		0423204F2DFB336700D03759 /* SwiftFlux */ = {
+		0416F36C2E0B479700CAEB09 /* SwiftFlux */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SwiftFlux;
 		};
