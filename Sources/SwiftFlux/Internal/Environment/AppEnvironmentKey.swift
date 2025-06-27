@@ -8,6 +8,7 @@
 import Foundation
 
 public protocol AppEnvironmentKey {
-    associatedtype Value: Sendable
-    static var defaultValue: Value { get }
+    typealias Container = AppEnvironmentValues
+    associatedtype Value
+    static func build(container: Container) -> Value
 }

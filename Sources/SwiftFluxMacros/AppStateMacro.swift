@@ -31,7 +31,7 @@ public struct AppStateMacro: MemberMacro {
             """
         let access: DeclSyntax =
             """
-            internal nonisolated func access<Member>(
+            nonisolated func access<Member>(
                 keyPath: KeyPath<\(className), Member>
             ) {
                 _$observationRegistrar.access(self, keyPath: keyPath)
@@ -39,7 +39,7 @@ public struct AppStateMacro: MemberMacro {
             """
         let withMutation: DeclSyntax =
             """
-            internal nonisolated func withMutation<Member, MutationResult>(
+            nonisolated func withMutation<Member, MutationResult>(
                 keyPath: KeyPath<\(className), Member>,
                 _ mutation: () throws -> MutationResult
             ) rethrows -> MutationResult {

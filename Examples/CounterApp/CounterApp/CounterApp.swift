@@ -9,6 +9,53 @@
 import SwiftFlux
 import SwiftUI
 
+@Observable
+final class TestFlight: SharedState {
+    let name: String
+
+    init(name: String) {
+        self.name = name
+    }
+
+    func register(in store: SwiftFlux.Store) {}
+}
+
+struct InnerAction: Action {
+    @AppEnvironment(TestFlight.self) private var flight
+
+    var body: some Action {
+        Async {
+            print("start")
+            print(flight.name)
+            try await Task.sleep(for: .seconds(1))
+            print("end")
+        }
+    }
+}
+
+struct MiddleAction: Action {
+    let state = TestFlight(name: "A")
+    let state2 = TestFlight(name: "B")
+
+    @Parallel
+    var body: some Action {
+        InnerAction()
+        InnerAction()
+            .environment(state)
+        InnerAction()
+            .environment(state2)
+    }
+}
+
+struct OuterAction: Action {
+    let state = TestFlight(name: "default")
+
+    var body: some Action {
+        MiddleAction()
+            .environment(state)
+    }
+}
+
 /// The main app structure.
 /// This demonstrates how to initialize and provide a SwiftFlux store to your app.
 @main
@@ -18,34 +65,6 @@ struct CounterApp: App {
     /// The @State property wrapper ensures the store is preserved across view updates.
     //    @State private var store = Store(CounterAppState())
     @State private var store = Store()
-
-    struct InnerAction: Action {
-        var body: some Action {
-            Async {
-                print("start")
-                try await Task.sleep(for: .seconds(1))
-                print("end")
-            }
-        }
-    }
-
-    struct MiddleAction: Action {
-
-        @Parallel
-        var body: some Action {
-            Parallel {
-                InnerAction()
-            }
-            InnerAction()
-            InnerAction()
-        }
-    }
-
-    struct OuterAction: Action {
-        var body: some Action {
-            MiddleAction()
-        }
-    }
 
     var body: some Scene {
         WindowGroup {
