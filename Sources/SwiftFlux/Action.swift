@@ -88,6 +88,10 @@ public struct Sequential: Action {
         [expression]
     }
 
+    public static func buildExpression(_ expression: Sequential...) -> [any Action] {
+        expression.flatMap { $0.actions }
+    }
+
     public static func buildArray(_ components: [[any Action]]) -> [any Action] {
         components.flatMap { $0 }
     }
@@ -141,6 +145,10 @@ public struct Parallel: Action {
 
     public static func buildExpression(_ expression: some Action) -> [any Action] {
         [expression]
+    }
+
+    public static func buildExpression(_ expression: Parallel...) -> [any Action] {
+        expression.flatMap { $0.actions }
     }
 
     public static func buildArray(_ components: [[any Action]]) -> [any Action] {
