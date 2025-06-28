@@ -6,10 +6,11 @@
 //
 
 import Foundation
-import SwiftUI
 
 @MainActor
 public final class Store {
+    public var environmentValues: AppEnvironmentValues = AppEnvironmentValues()
+
     public nonisolated init() {}
 
     public func dispatch(_ action: @autoclosure () -> some Action) {
@@ -30,14 +31,17 @@ public final class Store {
     }
 }
 
-extension Store: AppEnvironmentKey, EnvironmentKey {
-    public static nonisolated let defaultValue: Store = Store()
-    public static nonisolated func build(container: Container) -> Store { Store() }
-}
+#if canImport(SwiftUI)
+    import SwiftUI
 
-extension EnvironmentValues {
-    public var store: Store {
-        get { self[Store.self] }
-        set { self[Store.self] = newValue }
+    extension Store: AppEnvironmentKey, ViewEnvironmentKey {
+        public static nonisolated let defaultValue: Store = Store()
     }
-}
+
+    extension EnvironmentValues {
+        public var store: Store {
+            get { self[Store.self] }
+            set { self[Store.self] = newValue }
+        }
+    }
+#endif

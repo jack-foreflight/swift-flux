@@ -95,6 +95,14 @@ extension AppEnvironmentValues {
     @TaskLocal public static var current = AppEnvironmentValues()
 }
 
+#if canImport(SwiftUI)
+    import SwiftUI
+
+    extension AppEnvironmentKey where Self: SwiftUI.EnvironmentKey {
+        public static func build(container: Container) -> Value { Self.defaultValue }
+    }
+#endif
+
 @MainActor
 @discardableResult
 public func withEnvironment<Result: Sendable>(

@@ -14,7 +14,6 @@ public protocol Action: Sendable {
 }
 
 // MARK: Primitives
-
 enum Operation: Action {
     case sync(() throws -> Void)
     case async(() async throws -> Void)
@@ -22,8 +21,11 @@ enum Operation: Action {
     case parallel([any Action])
     case environment(AppEnvironmentValues, any Action)
     var body: some Action { self }
+}
 
-    var awaitable: Bool { if case .async = self { true } else { false } }
+public struct EmptyAction: Action {
+    public init() {}
+    public var body: some Action { Sync {} }
 }
 
 /// Primitive action that executes synchronously
@@ -46,123 +48,7 @@ public struct Async: Action {
     }
 }
 
-/// Group action that executes actions sequentially in order
-@resultBuilder
-public struct Sequential: Action {
-    let actions: [any Action]
-    public var body: some Action { Operation.sequential(actions) }
-
-    private init(_ actions: [any Action]) {
-        self.actions = actions
-    }
-
-    public init(@Sequential _ group: () -> Self) {
-        self.actions = group().actions
-    }
-
-    public static func buildBlock(_ components: (any Action)...) -> [any Action] {
-        components
-    }
-
-    public static func buildOptional(_ component: [any Action]?) -> [any Action] {
-        component ?? []
-    }
-
-    public static func buildEither(first component: [any Action]) -> [any Action] {
-        component
-    }
-
-    public static func buildEither(second component: [any Action]) -> [any Action] {
-        component
-    }
-
-    public static func buildPartialBlock(first: [any Action]) -> [any Action] {
-        first
-    }
-
-    public static func buildPartialBlock(accumulated: [any Action], next: [any Action]) -> [any Action] {
-        accumulated + next
-    }
-
-    public static func buildExpression(_ expression: some Action) -> [any Action] {
-        [expression]
-    }
-
-    public static func buildExpression(_ expression: Sequential...) -> [any Action] {
-        expression.flatMap { $0.actions }
-    }
-
-    public static func buildArray(_ components: [[any Action]]) -> [any Action] {
-        components.flatMap { $0 }
-    }
-
-    public static func buildLimitedAvailability(_ component: [any Action]) -> [any Action] {
-        component
-    }
-
-    public static func buildFinalResult(_ component: [any Action]) -> Sequential {
-        Sequential(component)
-    }
-}
-
-/// Group action that executes actions concurrently in parallel
-@resultBuilder
-public struct Parallel: Action {
-    let actions: [any Action]
-    public var body: some Action { Operation.parallel(actions) }
-
-    private init(_ actions: [any Action]) {
-        self.actions = actions
-    }
-
-    public init(@Parallel _ group: () -> Self) {
-        self.actions = group().actions
-    }
-
-    public static func buildBlock(_ components: (any Action)...) -> [any Action] {
-        components
-    }
-
-    public static func buildOptional(_ component: [any Action]?) -> [any Action] {
-        component ?? []
-    }
-
-    public static func buildEither(first component: [any Action]) -> [any Action] {
-        component
-    }
-
-    public static func buildEither(second component: [any Action]) -> [any Action] {
-        component
-    }
-
-    public static func buildPartialBlock(first: [any Action]) -> [any Action] {
-        first
-    }
-
-    public static func buildPartialBlock(accumulated: [any Action], next: [any Action]) -> [any Action] {
-        accumulated + next
-    }
-
-    public static func buildExpression(_ expression: some Action) -> [any Action] {
-        [expression]
-    }
-
-    public static func buildExpression(_ expression: Parallel...) -> [any Action] {
-        expression.flatMap { $0.actions }
-    }
-
-    public static func buildArray(_ components: [[any Action]]) -> [any Action] {
-        components.flatMap { $0 }
-    }
-
-    public static func buildLimitedAvailability(_ component: [any Action]) -> [any Action] {
-        component
-    }
-
-    public static func buildFinalResult(_ component: [any Action]) -> Parallel {
-        Parallel(component)
-    }
-}
+// MARK: Environment
 
 public struct EnvironmentAction<Body: Action>: Action {
     let environment: AppEnvironmentValues
@@ -202,12 +88,14 @@ public struct EnvironmentAction<Body: Action>: Action {
 // MARK: Extensions
 
 extension Operation {
-    @MainActor public func execute() throws {
+    var awaitable: Bool { if case .async = self { true } else { false } }
+
+    public func execute() throws {
         guard case .sync(let operation) = self else { return }
         try operation()
     }
 
-    @MainActor public func execute() async throws {
+    public func execute() async throws {
         switch self {
         case .sync(let operation): try operation()
         case .async(let operation): try await operation()
@@ -216,14 +104,15 @@ extension Operation {
     }
 }
 
+@MainActor
 extension [Operation] {
-    @MainActor var awaitable: Bool { contains { $0.awaitable } }
+    var awaitable: Bool { contains { $0.awaitable } }
 
-    @MainActor public func executeAll() throws {
+    public func executeAll() throws {
         for element in self { try element.execute() }
     }
 
-    @MainActor public func executeAll() async throws {
+    public func executeAll() async throws {
         for element in self {
             switch element {
             case .sync(let operation): try operation()
