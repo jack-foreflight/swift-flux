@@ -7,6 +7,4 @@
 
 import Foundation
 
-public protocol SharedState: AnyObject, Sendable {
-    @MainActor func register(in store: Store)
-}
+public protocol SharedState: Observable, AnyObject, Sendable {}

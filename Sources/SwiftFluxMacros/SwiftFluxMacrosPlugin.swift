@@ -14,12 +14,11 @@ struct SwiftFluxPlugin: CompilerPlugin {
     let providingMacros: [Macro.Type] = [
         AppStateMacro.self,
         AppEnvironmentMacro.self,
-        AppEnvironmentValueMacro.self,
     ]
 }
 
 struct MacroError: Error, CustomStringConvertible {
-    
+
     let description: String
 
     init(_ description: String) {

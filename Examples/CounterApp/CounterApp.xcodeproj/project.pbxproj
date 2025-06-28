@@ -39,16 +39,6 @@
 			path = CounterApp;
 			sourceTree = "<group>";
 		};
-		046B2DFE2DFB3271003C9EC9 /* CounterAppTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = CounterAppTests;
-			sourceTree = "<group>";
-		};
-		046B2E082DFB3271003C9EC9 /* CounterAppUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = CounterAppUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,8 +71,6 @@
 			isa = PBXGroup;
 			children = (
 				046B2DEC2DFB3270003C9EC9 /* CounterApp */,
-				046B2DFE2DFB3271003C9EC9 /* CounterAppTests */,
-				046B2E082DFB3271003C9EC9 /* CounterAppUITests */,
 				046B2DEB2DFB3270003C9EC9 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -136,9 +124,6 @@
 			dependencies = (
 				046B2DFD2DFB3271003C9EC9 /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				046B2DFE2DFB3271003C9EC9 /* CounterAppTests */,
-			);
 			name = CounterAppTests;
 			packageProductDependencies = (
 			);
@@ -158,9 +143,6 @@
 			);
 			dependencies = (
 				046B2E072DFB3271003C9EC9 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				046B2E082DFB3271003C9EC9 /* CounterAppUITests */,
 			);
 			name = CounterAppUITests;
 			packageProductDependencies = (
