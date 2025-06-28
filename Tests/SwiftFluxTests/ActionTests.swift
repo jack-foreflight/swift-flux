@@ -9,6 +9,48 @@ import Foundation
 import SwiftFlux
 import Testing
 
+/*
+ SwiftFlux Action Test Suite - Complexity Level Documentation
+
+ Level 1: Simple Single Actions
+ - Basic synchronous actions with single operations
+ - Basic asynchronous actions with minimal async work
+ - Direct state updates without composition
+ - Examples: SimpleIncrementAction, SimpleAsyncAction
+
+ Level 2: Basic Composition (Current CounterApp Level)
+ - Sequential and parallel action composition using @Sequential and @Parallel
+ - Multiple environment scopes with simple state models
+ - Basic action chaining and coordination
+ - Examples: SequentialCompositeAction, ParallelCompositeAction
+
+ Level 3: Multiple Environment Scopes & Complex State
+ - Multiple state instances with complex data structures
+ - Cross-state operations and synchronization
+ - Complex state mutations and metadata management
+ - Examples: MultiStateAction, DataProcessingAction, StateSynchronizationAction
+
+ Level 4: Deep Nesting & Conditional Logic
+ - Deeply nested action hierarchies (5+ levels)
+ - Conditional action execution based on runtime state
+ - Dynamic child state creation and management
+ - Complex processing with depth-based logic
+ - Examples: DeepNestedAction, ConditionalProcessingAction, DeepProcessingAction
+
+ Level 5: Maximum Complexity with Dynamic Composition
+ - Ultimate complexity with 100+ individual actions
+ - Dynamic action generation based on runtime analysis
+ - Massive parallel processing (25+ concurrent actions)
+ - Complex multi-phase system orchestration
+ - Cross-system coordination and synchronization
+ - Comprehensive validation and metrics calculation
+ - Examples: UltimateComplexAction, SystemInitializationAction, ComplexCoordinationAction
+
+ Each level builds upon the previous, demonstrating the full power and flexibility
+ of the SwiftFlux architecture for handling increasingly complex application logic
+ while maintaining clean, declarative action composition.
+ */
+
 // MARK: - Test State Models
 
 /// Basic state model for level 1 testing - single value tracking
@@ -315,11 +357,9 @@ struct CreateChildAction: Action {
 
             try await Task.sleep(for: .milliseconds(10))
 
-            // Simulate child processing
-            //            await ProcessChildStateAction()
-            //                .environment(childState)
-            //                .flattened
-            //                .execute()
+            try await ProcessChildStateAction()
+                .environment(childState)
+                .executeFlattened()
         }
     }
 }
@@ -1758,47 +1798,3 @@ extension String {
         String(repeating: self, count: count)
     }
 }
-
-// MARK: - Test Documentation
-
-/*
- SwiftFlux Action Test Suite - Complexity Level Documentation
-
- Level 1: Simple Single Actions
- - Basic synchronous actions with single operations
- - Basic asynchronous actions with minimal async work
- - Direct state updates without composition
- - Examples: SimpleIncrementAction, SimpleAsyncAction
-
- Level 2: Basic Composition (Current CounterApp Level)
- - Sequential and parallel action composition using @Sequential and @Parallel
- - Multiple environment scopes with simple state models
- - Basic action chaining and coordination
- - Examples: SequentialCompositeAction, ParallelCompositeAction
-
- Level 3: Multiple Environment Scopes & Complex State
- - Multiple state instances with complex data structures
- - Cross-state operations and synchronization
- - Complex state mutations and metadata management
- - Examples: MultiStateAction, DataProcessingAction, StateSynchronizationAction
-
- Level 4: Deep Nesting & Conditional Logic
- - Deeply nested action hierarchies (5+ levels)
- - Conditional action execution based on runtime state
- - Dynamic child state creation and management
- - Complex processing with depth-based logic
- - Examples: DeepNestedAction, ConditionalProcessingAction, DeepProcessingAction
-
- Level 5: Maximum Complexity with Dynamic Composition
- - Ultimate complexity with 100+ individual actions
- - Dynamic action generation based on runtime analysis
- - Massive parallel processing (25+ concurrent actions)
- - Complex multi-phase system orchestration
- - Cross-system coordination and synchronization
- - Comprehensive validation and metrics calculation
- - Examples: UltimateComplexAction, SystemInitializationAction, ComplexCoordinationAction
-
- Each level builds upon the previous, demonstrating the full power and flexibility
- of the SwiftFlux architecture for handling increasingly complex application logic
- while maintaining clean, declarative action composition.
- */

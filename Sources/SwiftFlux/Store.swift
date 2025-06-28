@@ -20,9 +20,9 @@ public final class Store {
         let operations = action.flattened
         do {
             if operations.awaitable {
-                Task { try await operations.execute() }
+                Task { try await operations.executeAll() }
             } else {
-                try operations.execute()
+                try operations.executeAll()
             }
         } catch {
             // Handle Error Placeholder

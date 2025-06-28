@@ -202,12 +202,12 @@ public struct EnvironmentAction<Body: Action>: Action {
 // MARK: Extensions
 
 extension Operation {
-    @MainActor func execute() throws {
+    @MainActor public func execute() throws {
         guard case .sync(let operation) = self else { return }
         try operation()
     }
 
-    @MainActor func execute() async throws {
+    @MainActor public func execute() async throws {
         switch self {
         case .sync(let operation): try operation()
         case .async(let operation): try await operation()
@@ -219,11 +219,11 @@ extension Operation {
 extension [Operation] {
     @MainActor var awaitable: Bool { contains { $0.awaitable } }
 
-    @MainActor func execute() throws {
+    @MainActor public func executeAll() throws {
         for element in self { try element.execute() }
     }
 
-    @MainActor func execute() async throws {
+    @MainActor public func executeAll() async throws {
         for element in self {
             switch element {
             case .sync(let operation): try operation()
@@ -235,6 +235,19 @@ extension [Operation] {
 }
 
 extension Action {
+    public func dispatch() {
+        @AppEnvironment(Store.self) var store
+        store.dispatch(self)
+    }
+
+    public func executeFlattened() throws {
+        try flattened.executeAll()
+    }
+
+    public func executeFlattened() async throws {
+        try await flattened.executeAll()
+    }
+
     @inline(__always)
     var flattened: [Operation] {
         guard let operation = self as? Operation else { return body.flattened }
@@ -257,13 +270,15 @@ extension Action {
                 return operations
             }
         case .environment(let environment, let action):
-            return action.flattened.compactMap {
-                switch $0 {
-                case .sync(let operation):
-                    return .sync { try withEnvironment(environment) { try operation() } }
-                case .async(let operation):
-                    return .async { try await withEnvironment(environment) { try await operation() } }
-                default: return nil
+            return withEnvironment(environment) {
+                action.flattened.compactMap {
+                    switch $0 {
+                    case .sync(let operation):
+                        return .sync { try withEnvironment(environment) { try operation() } }
+                    case .async(let operation):
+                        return .async { try await withEnvironment(environment) { try await operation() } }
+                    default: return nil
+                    }
                 }
             }
         }
