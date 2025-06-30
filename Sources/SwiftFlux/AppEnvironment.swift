@@ -36,11 +36,11 @@ public struct AppEnvironment<Value> {
     }
 
     public init(
-        _ value: Value.Type,
+        _ state: Value.Type,
         file: StaticString = #file,
         line: UInt = #line
-    ) where Value: SharedState {
-        self.value = { AppEnvironmentValues.current[value, file, line] }
+    ) where Value: Sendable {
+        self.value = { AppEnvironmentValues.current[state, file, line] }
     }
 }
 
@@ -66,7 +66,7 @@ public struct AppEnvironmentValues: Sendable {
         set { register(newValue) }
     }
 
-    public subscript<State: SharedState>(state: State.Type, file: StaticString = #file, line: UInt = #line) -> State {
+    public subscript<State: Sendable>(state: State.Type, file: StaticString = #file, line: UInt = #line) -> State {
         get { resolve(state, file: file, line: line) }
         set { register(newValue) }
     }
@@ -227,7 +227,7 @@ public func withEnvironment<Result: Sendable>(
 
 @MainActor
 @discardableResult
-public func withState<State: SharedState, Result: Sendable>(
+public func withState<State: Sendable, Result: Sendable>(
     _ state: State,
     file: StaticString = #file,
     line: UInt = #line,
@@ -242,7 +242,7 @@ public func withState<State: SharedState, Result: Sendable>(
 
 @MainActor
 @discardableResult
-public func withState<State: SharedState, Result: Sendable>(
+public func withState<State: Sendable, Result: Sendable>(
     _ state: State,
     file: StaticString = #file,
     line: UInt = #line,

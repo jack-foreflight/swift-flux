@@ -23,11 +23,6 @@ enum Operation: Action {
     var body: some Action { self }
 }
 
-public struct EmptyAction: Action {
-    public init() {}
-    public var body: some Action { Sync {} }
-}
-
 /// Primitive action that executes synchronously
 public struct Sync: Action {
     let operation: () throws -> Void
@@ -46,43 +41,6 @@ public struct Async: Action {
     public init(_ operation: @escaping () async throws -> Void) {
         self.operation = operation
     }
-}
-
-// MARK: Environment
-
-public struct EnvironmentAction<Body: Action>: Action {
-    let environment: AppEnvironmentValues
-    let build: () -> Body
-
-    init(store: Store, build: @escaping () -> Body) {
-        self.environment = withStore(store) { AppEnvironmentValues.current }
-        self.build = { withStore(store) { build() } }
-    }
-
-    init(state: some SharedState, build: @escaping () -> Body) {
-        self.environment = withState(state) { AppEnvironmentValues.current }
-        self.build = { withState(state) { build() } }
-    }
-
-    init<Value>(
-        keyPath: WritableKeyPath<AppEnvironmentValues, Value>,
-        value: Value,
-        build: @escaping () -> Body
-    ) {
-        self.environment = withEnvironment(keyPath, value: value) { AppEnvironmentValues.current }
-        self.build = { withEnvironment(keyPath, value: value) { build() } }
-    }
-
-    init<Key: AppEnvironmentKey>(
-        key: Key.Type,
-        value: Key.Value,
-        build: @escaping () -> Body
-    ) {
-        self.environment = withEnvironment(key, value: value) { AppEnvironmentValues.current }
-        self.build = { withEnvironment(key, value: value) { build() } }
-    }
-
-    public var body: some Action { Operation.environment(environment, build()) }
 }
 
 // MARK: Extensions
@@ -179,7 +137,7 @@ extension Action {
         EnvironmentAction(store: store) { self }
     }
 
-    public func environment(_ state: some SharedState) -> some Action {
+    public func environment<State: Sendable>(_ state: State) -> some Action {
         EnvironmentAction(state: state) { self }
     }
 
