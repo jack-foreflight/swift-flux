@@ -6,12 +6,17 @@
 //
 
 import Foundation
+import SwiftUI
 
 @MainActor
 public final class Store {
-    public var environmentValues: AppEnvironmentValues = AppEnvironmentValues()
+    var environmentValues: AppEnvironmentValues = AppEnvironmentValues()
 
     public nonisolated init() {}
+
+    public func resolve<State: Sendable>(_ state: State.Type = State.self) -> State {
+        environmentValues[state]
+    }
 
     public func dispatch(_ action: @autoclosure () -> some Action) {
         withStore(self) { execute(action()) }
@@ -31,17 +36,9 @@ public final class Store {
     }
 }
 
-#if canImport(SwiftUI)
-    import SwiftUI
-
-    extension Store: AppEnvironmentKey, ViewEnvironmentKey {
-        public static nonisolated let defaultValue: Store = Store()
-    }
-
-    extension EnvironmentValues {
-        public var store: Store {
-            get { self[Store.self] }
-            set { self[Store.self] = newValue }
-        }
-    }
-#endif
+/// A macro that automatically implements AppState conformance and Observable behavior.
+/// This macro generates the necessary observation infrastructure and automatic registration
+/// of nested AppState properties.
+@attached(member, names: named(store), named(dispatch))
+@attached(extension, conformances: Selecting, Dispatching)
+public macro StoreView() = #externalMacro(module: "SwiftFluxMacros", type: "StoreViewMacro")

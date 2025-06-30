@@ -74,7 +74,7 @@ public struct AppEnvironmentValues: Sendable {
     private func resolve<Value: Sendable>(_ value: Value.Type, file: StaticString = #file, line: UInt = #line) -> Value {
         guard let value = storage[ObjectIdentifier(value)] as? Value else {
             let typeName = String(describing: value)
-            let message = "No Observable object of type \(typeName) found. An Action.environment(_:) for \(typeName) may be missing as an ancestor of this action."
+            let message = "No Object of type \(typeName) found. An Action.environment(_:) for \(typeName) may be missing as an ancestor of this action."
 
             #if DEBUG
                 fatalError(message, file: file, line: line)
@@ -95,14 +95,6 @@ extension AppEnvironmentValues {
     @TaskLocal public static var current = AppEnvironmentValues()
 }
 
-#if canImport(SwiftUI)
-    import SwiftUI
-
-    extension AppEnvironmentKey where Self: SwiftUI.EnvironmentKey {
-        public static func build(container: Container) -> Value { Self.defaultValue }
-    }
-#endif
-
 @MainActor
 @discardableResult
 public func withEnvironment<Result: Sendable>(
@@ -133,7 +125,7 @@ public func withEnvironment<Result: Sendable>(
 
 @MainActor
 @discardableResult
-public func withEnvironment<Value, Result: Sendable>(
+public func withEnvironment<Value, Result>(
     _ keyPath: WritableKeyPath<AppEnvironmentValues, Value>,
     value: Value,
     file: StaticString = #file,
@@ -227,7 +219,7 @@ public func withEnvironment<Result: Sendable>(
 
 @MainActor
 @discardableResult
-public func withState<State: Sendable, Result: Sendable>(
+public func withState<State: Sendable, Result>(
     _ state: State,
     file: StaticString = #file,
     line: UInt = #line,

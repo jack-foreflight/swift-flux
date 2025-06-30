@@ -7,6 +7,19 @@
 
 import Foundation
 
+public protocol Effect {
+    associatedtype Condition: SwiftFlux.Condition
+    associatedtype Body: Action
+
+    var condition: Condition { get }
+    var body: Body { get }
+}
+
+extension Effect where Condition == Bool {
+    public static var always: Condition { true }
+    public static var never: Condition { false }
+}
+
 public protocol Condition {
     func evaluate(store: Store) -> Bool
 }
@@ -23,17 +36,4 @@ public struct OnChange<State>: Condition {
     public func evaluate(store: Store) -> Bool {
         true
     }
-}
-
-public protocol Effect {
-    associatedtype Condition: SwiftFlux.Condition
-    associatedtype Body: Action
-
-    var condition: Condition { get }
-    var body: Body { get }
-}
-
-extension Effect where Condition == Bool {
-    public static var always: Condition { true }
-    public static var never: Condition { false }
 }

@@ -30,31 +30,35 @@ public final class StateModel: Sendable, Identifiable {
 
 @main
 struct CounterApp: App {
-
     /// The Store is initialized within the root application
-
     @State private var store = Store()
 
     var body: some Scene {
         WindowGroup {
-            Button {
-                /// We dispatch actions directly to the store.
-                store.dispatch(OuterAction())
-            } label: {
-                Text("Dispatch Action")
+            VStack {
+                MiddleView()
             }
         }
         .environment(\.store, store)
     }
 }
 
-//struct SubView: View {
-//    @Select(StateModel.self) private var state
-//
-//    var body: some View {
-//        Text(state.id)
-//    }
-//}
+struct MiddleView: View {
+    var body: some View {
+        SubView()
+    }
+}
+
+@StoreView
+struct SubView: View {
+    var body: some View {
+        Button {
+            dispatch(OuterAction())
+        } label: {
+            Text(select(StateModel.self).id)
+        }
+    }
+}
 
 /// Actions:
 /// We are going to be testing with a basic action flow with composed Actions. OuterAction describes one to many actions within its body - in this case, we only have MiddleAction which has a modifier "environment" which we've defined in Action.swift

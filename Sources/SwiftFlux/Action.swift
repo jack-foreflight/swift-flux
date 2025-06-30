@@ -44,7 +44,6 @@ public struct Async: Action {
 }
 
 // MARK: Extensions
-
 extension Operation {
     var awaitable: Bool { if case .async = self { true } else { false } }
 
@@ -129,29 +128,5 @@ extension Action {
                 }
             }
         }
-    }
-}
-
-extension Action {
-    public func environment(_ store: Store) -> some Action {
-        EnvironmentAction(store: store) { self }
-    }
-
-    public func environment<State: Sendable>(_ state: State) -> some Action {
-        EnvironmentAction(state: state) { self }
-    }
-
-    public func environment<Value>(
-        _ keyPath: WritableKeyPath<AppEnvironmentValues, Value>,
-        _ value: Value
-    ) -> some Action {
-        EnvironmentAction(keyPath: keyPath, value: value) { self }
-    }
-
-    public func environment<Key: AppEnvironmentKey>(
-        _ key: Key.Type,
-        _ value: Key.Value
-    ) -> some Action {
-        EnvironmentAction(key: key, value: value) { self }
     }
 }
