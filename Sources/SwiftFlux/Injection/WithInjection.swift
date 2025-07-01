@@ -9,7 +9,7 @@ import Foundation
 
 @MainActor
 @discardableResult
-public func withInjection<Result: Sendable>(
+public func withInjection<Result>(
     _ newValues: InjectionValues,
     file: StaticString = #file,
     line: UInt = #line,
@@ -69,7 +69,7 @@ public func withInjection<Value, Result: Sendable>(
 
 @MainActor
 @discardableResult
-public func withInjection<Key: Injection, Result: Sendable>(
+public func withInjection<Key: Injection, Result>(
     _ key: Key.Type,
     value: Key.Value,
     file: StaticString = #file,
@@ -101,7 +101,7 @@ public func withInjection<Key: Injection, Result: Sendable>(
 
 @MainActor
 @discardableResult
-public func withInjection<Result: Sendable>(
+public func withInjection<Result>(
     _ updateValues: (inout InjectionValues) -> Void,
     file: StaticString = #file,
     line: UInt = #line,

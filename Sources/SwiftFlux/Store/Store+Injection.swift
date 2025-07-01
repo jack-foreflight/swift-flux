@@ -9,6 +9,6 @@ import Foundation
 
 extension Store: Injection {
     public static nonisolated func inject(container: Container) -> Value {
-        Store()
+        Store.build()
     }
 }
