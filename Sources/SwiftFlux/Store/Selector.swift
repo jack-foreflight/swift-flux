@@ -8,7 +8,7 @@
 import Foundation
 
 @MainActor
-public protocol Selector {
+public protocol Selector: Sendable {
     var store: Store { get }
 }
 

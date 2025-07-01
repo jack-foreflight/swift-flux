@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol Injection {
+public protocol Injection: Sendable {
     typealias Container = InjectionValues
     associatedtype Value: Sendable
     static var defaultValue: Value { get }

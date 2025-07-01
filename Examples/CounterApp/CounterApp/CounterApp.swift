@@ -35,8 +35,10 @@ struct CounterApp: App {
 
     var body: some Scene {
         WindowGroup {
-            VStack {
-                MiddleView()
+            Button {
+                store.dispatch(OuterAction())
+            } label: {
+                Text("Dispatch Action")
             }
         }
         .environment(\.store, store)
@@ -83,7 +85,7 @@ struct MiddleAction: Action {
 
     /// Note that we've decorated this Action body with the resultBuilder @Parallel. This means that the contents of this Action should be executed in Parallel and if needed, should await the completion of all of the Actions for the Parallel action to complete.
 
-    @Parallel
+    @Sequential
     var body: some Action {
         /// The execution of this InnerAction should operate with StateModel(id: "default") as we are not injecting any override state here. This should inherit from the parent.
         InnerAction()

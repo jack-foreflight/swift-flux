@@ -8,7 +8,7 @@
 import Foundation
 
 @MainActor
-public protocol Selection {
+public protocol Selection: Sendable {
     associatedtype State
     func select() -> State
 }

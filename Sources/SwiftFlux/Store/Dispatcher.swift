@@ -8,7 +8,7 @@
 import Foundation
 
 @MainActor
-public protocol Dispatcher {
+public protocol Dispatcher: Sendable {
     var store: Store { get }
 }
 

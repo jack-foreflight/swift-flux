@@ -6,8 +6,9 @@
 //
 
 import Foundation
-import SwiftFlux
 import Testing
+
+@testable import SwiftFlux
 
 /*
  SwiftFlux Action Test Suite - Complexity Level Documentation
@@ -1593,7 +1594,7 @@ struct ActionTests {
     @Test("Level 1: Simple Single Actions")
     @MainActor
     func testLevel1SimpleActions() async throws {
-        let store = Store()
+        let store = Store.build()
         let state = SimpleState(id: "test")
 
         // Test simple increment
@@ -1618,7 +1619,7 @@ struct ActionTests {
     @Test("Level 2: Basic Composition Actions")
     @MainActor
     func testLevel2CompositionActions() async throws {
-        let store = Store()
+        let store = Store.build()
 
         // Test sequential composition
         store.dispatch(SequentialCompositeAction())
@@ -1642,7 +1643,7 @@ struct ActionTests {
     @Test("Level 3: Multiple Environment Scopes & Complex State")
     @MainActor
     func testLevel3ComplexState() async throws {
-        let store = Store()
+        let store = Store.build()
 
         // Test multi-state action with complex operations
         store.dispatch(MultiStateAction())
@@ -1660,7 +1661,7 @@ struct ActionTests {
     @Test("Level 4: Deep Nesting & Conditional Logic")
     @MainActor
     func testLevel4DeepNesting() async throws {
-        let store = Store()
+        let store = Store.build()
 
         // Test deeply nested action hierarchy
         store.dispatch(DeepNestedAction())
@@ -1679,7 +1680,7 @@ struct ActionTests {
     @Test("Level 5: Maximum Complexity with Dynamic Composition")
     @MainActor
     func testLevel5UltimateComplexity() async throws {
-        let store = Store()
+        let store = Store.build()
 
         print("🚀 Starting Level 5 Ultimate Complexity Test...")
         print("This test demonstrates the maximum complexity of SwiftFlux action composition")
@@ -1705,7 +1706,7 @@ struct ActionTests {
     @Test("Comprehensive Integration Test: All Levels")
     @MainActor
     func testAllLevelsIntegration() async throws {
-        let store = Store()
+        let store = Store.build()
 
         print("🧪 Running comprehensive integration test across all complexity levels...")
 
@@ -1742,7 +1743,7 @@ struct ActionTests {
     @Test("Performance Test: Concurrent Level 5 Actions")
     @MainActor
     func testConcurrentComplexActions() async throws {
-        let store = Store()
+        let store = Store.build()
 
         print("⚡ Performance test: Running multiple Level 5 actions concurrently...")
 
@@ -1769,7 +1770,7 @@ struct ActionTests {
     @Test("Error Handling and Recovery")
     @MainActor
     func testErrorHandlingAndRecovery() async throws {
-        let store = Store()
+        let store = Store.build()
         let state = SimpleState(id: "error_test")
 
         // Test that system continues functioning after error scenarios

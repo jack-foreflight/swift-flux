@@ -21,7 +21,6 @@ public func withStore<Result>(
     }
 }
 
-@MainActor
 @discardableResult
 public func withStore<Result: Sendable>(
     _ store: Store,

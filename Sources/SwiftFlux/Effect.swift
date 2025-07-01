@@ -8,7 +8,7 @@
 import Foundation
 
 @MainActor
-public protocol Effect {
+public protocol Effect: Sendable {
     associatedtype Event: SwiftFlux.Event
     associatedtype Body: SwiftFlux.Action
 

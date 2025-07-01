@@ -8,7 +8,7 @@
 import Foundation
 
 @MainActor
-public protocol Binder {
+public protocol Binder: Sendable {
     var store: Store { get }
 }
 
