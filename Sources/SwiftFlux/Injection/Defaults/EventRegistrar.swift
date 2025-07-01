@@ -13,22 +13,22 @@ import Foundation
 
 @MainActor
 final class EventRegistrar: Injection {
-    private var effects: [any Effect] = []
+    private var events: [any Event] = []
     private var willDispatch: [(any Action) -> Void] = []
     private var didDispatch: [(any Action) -> Void] = []
 
     nonisolated init() {}
 
     func register(_ event: @autoclosure () -> some Event) {
-
+        events.append(event())
     }
 
-    func registerWillDispatch(_ effect: (any Action) -> Void) {
-
+    func registerWillDispatch(_ event: @escaping (any Action) -> Void) {
+        willDispatch.append(event)
     }
 
-    func registerDidDispatch(_ effect: (any Action) -> Void) {
-
+    func registerDidDispatch(_ event: @escaping (any Action) -> Void) {
+        didDispatch.append(event)
     }
 
     func willDispatch(_ action: some Action) {

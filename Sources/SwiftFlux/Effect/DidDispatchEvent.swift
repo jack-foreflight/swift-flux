@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct DidDispatchEvent<Action: SwiftFlux.Action, Effect: SwiftFlux.Effect>: Event {
+public struct DidDispatchEvent<Action, Effect: SwiftFlux.Effect>: Event {
     @Injected(Store.self) private var store
     @Injected(\.events) private var events
 

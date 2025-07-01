@@ -1,0 +1,14 @@
+//
+//  Effect+Extensions.swift
+//  swift-flux
+//
+//  Created by Jack Zhao on 7/1/25.
+//
+
+import Foundation
+
+extension Effect {
+    public var event: some SwiftFlux.Event {
+        DidDispatchEvent { (_: any Action) in self }
+    }
+}
