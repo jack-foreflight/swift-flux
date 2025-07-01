@@ -8,7 +8,7 @@
 import Foundation
 
 public struct StateTypeSelection<State: Sendable>: Selection {
+    @Injected(State.self) private var state
     public init() {}
-
-    public func select(store: Store) -> State { store.resolve() }
+    public func select() -> State { state }
 }

@@ -8,11 +8,12 @@
 import Foundation
 
 public struct StateMapSelection<SharedState: Sendable, State>: Selection {
+    @Injected(SharedState.self) private var state
     private let map: (SharedState) -> State
 
     public init(map: @escaping (SharedState) -> State) {
         self.map = map
     }
 
-    public func select(store: Store) -> State { map(store.resolve()) }
+    public func select() -> State { map(state) }
 }

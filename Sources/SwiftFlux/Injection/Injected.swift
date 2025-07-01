@@ -7,7 +7,6 @@
 
 import Foundation
 
-@MainActor
 @propertyWrapper
 public struct Injected<Value> {
     let value: () -> Value
@@ -35,5 +34,17 @@ public struct Injected<Value> {
         line: UInt = #line
     ) where Value: Sendable {
         self.value = { InjectionValues.current[state, file, line] }
+    }
+
+    public static subscript<Key: Injection>(key: Key.Type) -> Value where Key.Value == Value {
+        InjectionValues.current[key]
+    }
+
+    public static subscript(keyPath: KeyPath<InjectionValues, Value>) -> Value {
+        InjectionValues.current[keyPath: keyPath]
+    }
+
+    public static subscript(state: Value.Type, file: StaticString = #file, line: UInt = #line) -> Value where Value: Sendable {
+        InjectionValues.current[state, file, line]
     }
 }

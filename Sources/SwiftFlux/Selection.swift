@@ -8,7 +8,7 @@
 import Foundation
 
 @MainActor
-public protocol Selection<State> {
+public protocol Selection {
     associatedtype State
-    func select(store: Store) -> State
+    func select() -> State
 }

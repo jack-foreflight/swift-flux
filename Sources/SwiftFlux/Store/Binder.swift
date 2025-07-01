@@ -11,3 +11,7 @@ import Foundation
 public protocol Binder {
     var store: Store { get }
 }
+
+extension Binder {
+
+}

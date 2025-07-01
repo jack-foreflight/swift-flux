@@ -7,10 +7,11 @@
 
 import Foundation
 
+@MainActor
 public protocol Effect {
-    associatedtype Condition: SwiftFlux.Condition
-    associatedtype Body: Action
+    associatedtype Event: SwiftFlux.Event
+    associatedtype Body: SwiftFlux.Action
 
-    var condition: Condition { get }
+    var event: Event { get }
     var body: Body { get }
 }

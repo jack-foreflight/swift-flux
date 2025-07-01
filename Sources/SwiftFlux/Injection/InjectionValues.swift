@@ -7,9 +7,8 @@
 
 import Foundation
 
-@MainActor
 public struct InjectionValues: Sendable {
-    private var storage: [ObjectIdentifier: Any] = [:]
+    private var storage: [ObjectIdentifier: any Sendable] = [:]
 
     public nonisolated init() {}
 
@@ -20,13 +19,8 @@ public struct InjectionValues: Sendable {
     }
 
     public subscript<Key: Injection>(key: Key.Type) -> Key.Value {
-        get { storage[ObjectIdentifier(key)] as? Key.Value ?? key.inject(container: self) }
+        get { storage[ObjectIdentifier(key)] as? Key.Value ?? key.defaultValue }
         set { storage[ObjectIdentifier(key)] = newValue }
-    }
-
-    public subscript(store: Store.Type, file: StaticString = #file, line: UInt = #line) -> Store {
-        get { resolve(store, file: file, line: line) }
-        set { register(newValue) }
     }
 
     public subscript<State: Sendable>(state: State.Type, file: StaticString = #file, line: UInt = #line) -> State {
@@ -34,7 +28,11 @@ public struct InjectionValues: Sendable {
         set { register(newValue) }
     }
 
-    private func resolve<Value: Sendable>(_ value: Value.Type, file: StaticString = #file, line: UInt = #line) -> Value {
+    mutating func register<Value: Sendable>(_ newValue: Value) {
+        storage[ObjectIdentifier(Value.self)] = newValue
+    }
+
+    func resolve<Value: Sendable>(_ value: Value.Type, file: StaticString = #file, line: UInt = #line) -> Value {
         guard let value = storage[ObjectIdentifier(value)] as? Value else {
             let typeName = String(describing: value)
             let message = "No Object of type \(typeName) found. An Action.environment(_:) for \(typeName) may be missing as an ancestor of this action."
@@ -47,10 +45,6 @@ public struct InjectionValues: Sendable {
             #endif
         }
         return value
-    }
-
-    private mutating func register<Value: Sendable>(_ newValue: Value) {
-        storage[ObjectIdentifier(Value.self)] = newValue
     }
 }
 

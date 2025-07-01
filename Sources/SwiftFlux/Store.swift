@@ -8,20 +8,40 @@
 import Foundation
 
 @MainActor
-public final class Store {
-    var injection: InjectionValues = InjectionValues()
+public final class Store: Sendable {
+    private let injectionValues: InjectionValues
 
-    public nonisolated init() {}
+    public nonisolated init() {
+        self.injectionValues = InjectionValues()
+    }
 
-    public func resolve<State: Sendable>(_ state: State.Type = State.self) -> State {
-        injection[state]
+    nonisolated init(injectionValues: InjectionValues) {
+        self.injectionValues = injectionValues
+    }
+
+    public func select<Selection: SwiftFlux.Selection>(_ selection: @autoclosure () -> Selection) -> Selection.State {
+        withStore(self) {
+            withInjection(injectionValues) {
+                selection().select()
+            }
+        }
     }
 
     public func dispatch(_ action: @autoclosure () -> some Action) {
-        withStore(self) { execute(action()) }
+        withStore(self) {
+            withInjection(injectionValues) {
+                execute(action())
+            }
+        }
+    }
+
+    public func handle(_ effect: @autoclosure () -> some Effect) {
+
     }
 
     private func execute(_ action: some Action) {
+        Injected[\.events].willDispatch(action)
+        defer { Injected[\.events].didDispatch(action) }
         let operations = action.flattened
         do {
             if operations.awaitable {
@@ -30,7 +50,7 @@ public final class Store {
                 try operations.executeAll()
             }
         } catch {
-            // Handle Error Placeholder
+            // TODO: Handle Error Placeholder
         }
     }
 }

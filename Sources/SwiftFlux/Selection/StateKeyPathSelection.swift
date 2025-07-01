@@ -15,5 +15,5 @@ public struct StateKeyPathSelection<SharedState: Sendable, State>: Selection {
         self.keyPath = keyPath
     }
 
-    public func select(store: Store) -> State { store.resolve(SharedState.self)[keyPath: keyPath] }
+    public func select() -> State { state[keyPath: keyPath] }
 }

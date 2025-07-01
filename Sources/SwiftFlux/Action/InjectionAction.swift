@@ -43,6 +43,28 @@ public struct InjectionAction<Body: Action>: Action {
 }
 
 extension Action {
+    public func injecting(_ store: Store) -> some Action {
+        InjectionAction(store: store) { self }
+    }
+
+    public func injecting<State: Sendable>(_ state: State) -> some Action {
+        InjectionAction(state: state) { self }
+    }
+
+    public func injecting<Value>(
+        _ keyPath: WritableKeyPath<InjectionValues, Value>,
+        _ value: Value
+    ) -> some Action {
+        InjectionAction(keyPath: keyPath, value: value) { self }
+    }
+
+    public func injecting<Key: Injection>(
+        _ key: Key.Type,
+        _ value: Key.Value
+    ) -> some Action {
+        InjectionAction(key: key, value: value) { self }
+    }
+
     public func environment(_ store: Store) -> some Action {
         InjectionAction(store: store) { self }
     }

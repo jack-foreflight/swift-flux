@@ -8,5 +8,5 @@
 import Foundation
 
 public protocol LiveInjection: Injection {
-    static func live(container: Container) -> Value
+    static var liveValue: Value { get }
 }

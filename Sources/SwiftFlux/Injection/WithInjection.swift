@@ -7,7 +7,6 @@
 
 import Foundation
 
-@MainActor
 @discardableResult
 public func withInjection<Result>(
     _ newValues: InjectionValues,
@@ -35,7 +34,6 @@ public func withInjection<Result: Sendable>(
     }
 }
 
-@MainActor
 @discardableResult
 public func withInjection<Value, Result>(
     _ keyPath: WritableKeyPath<InjectionValues, Value>,
@@ -67,7 +65,6 @@ public func withInjection<Value, Result: Sendable>(
     }
 }
 
-@MainActor
 @discardableResult
 public func withInjection<Key: Injection, Result>(
     _ key: Key.Type,
@@ -99,7 +96,6 @@ public func withInjection<Key: Injection, Result: Sendable>(
     }
 }
 
-@MainActor
 @discardableResult
 public func withInjection<Result>(
     _ updateValues: (inout InjectionValues) -> Void,
@@ -129,7 +125,6 @@ public func withInjection<Result: Sendable>(
     }
 }
 
-@MainActor
 @discardableResult
 public func withState<State: Sendable, Result>(
     _ state: State,
@@ -154,34 +149,6 @@ public func withState<State: Sendable, Result: Sendable>(
 ) async rethrows -> Result {
     var operationScoped = InjectionValues.current
     operationScoped[State.self] = state
-    return try await InjectionValues.$current.withValue(operationScoped) {
-        try await operation()
-    }
-}
-
-@MainActor
-@discardableResult public func withStore<Result>(
-    _ store: Store,
-    file: StaticString = #file,
-    line: UInt = #line,
-    operation: () throws -> Result
-) rethrows -> Result {
-    var operationScoped = InjectionValues.current
-    operationScoped[Store.self] = store
-    return try InjectionValues.$current.withValue(operationScoped) {
-        try operation()
-    }
-}
-
-@MainActor
-@discardableResult public func withStore<Result: Sendable>(
-    _ store: Store,
-    file: StaticString = #file,
-    line: UInt = #line,
-    operation: () async throws -> Result
-) async rethrows -> Result {
-    var operationScoped = InjectionValues.current
-    operationScoped[Store.self] = store
     return try await InjectionValues.$current.withValue(operationScoped) {
         try await operation()
     }

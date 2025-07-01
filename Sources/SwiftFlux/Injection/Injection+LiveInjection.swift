@@ -8,5 +8,5 @@
 import Foundation
 
 extension Injection where Self: LiveInjection {
-    public static func inject(container: Container) -> Value { live(container: container) }
+    public static var defaultValue: Value { liveValue }
 }

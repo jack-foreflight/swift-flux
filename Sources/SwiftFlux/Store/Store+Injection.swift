@@ -7,8 +7,11 @@
 
 import Foundation
 
-extension Store: Injection {
-    public static nonisolated func inject(container: Container) -> Value {
-        Store.build()
+extension Store: Injection {}
+
+extension InjectionValues {
+    public var store: Store {
+        get { self[Store.self] }
+        set { self[Store.self] = newValue }
     }
 }

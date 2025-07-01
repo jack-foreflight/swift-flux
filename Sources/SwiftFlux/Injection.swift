@@ -9,6 +9,6 @@ import Foundation
 
 public protocol Injection {
     typealias Container = InjectionValues
-    associatedtype Value
-    static func inject(container: Container) -> Value
+    associatedtype Value: Sendable
+    static var defaultValue: Value { get }
 }

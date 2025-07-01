@@ -8,7 +8,7 @@
 import Foundation
 
 @MainActor
-public protocol Action: Sendable {
+public protocol Action {
     associatedtype Body: Action
     var body: Body { get }
 }

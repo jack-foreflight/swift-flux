@@ -8,7 +8,7 @@
 import Foundation
 
 @MainActor
-public protocol ActionModifier: Sendable {
+public protocol ActionModifier {
     associatedtype Builder: ActionBuilder
     associatedtype Body: Action
     typealias Content = ModifiedContent
