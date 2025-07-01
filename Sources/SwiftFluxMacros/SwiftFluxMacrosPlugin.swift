@@ -14,7 +14,7 @@ struct SwiftFluxPlugin: CompilerPlugin {
     let providingMacros: [Macro.Type] = [
         AppStateMacro.self,
         AppEnvironmentMacro.self,
-        StoreViewMacro.self,
+        StoreProvidingMacro.self,
     ]
 }
 

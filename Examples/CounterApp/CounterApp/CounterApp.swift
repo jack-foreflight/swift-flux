@@ -49,7 +49,7 @@ struct MiddleView: View {
     }
 }
 
-@StoreView
+@StoreProviding
 struct SubView: View {
     var body: some View {
         Button {
@@ -101,7 +101,7 @@ struct MiddleAction: Action {
 struct InnerAction: Action {
     /// We use the property wrapper @AppEnvironment to access environment values similarly to how SwiftUI allows you to access scoped instances of Environment with the @Environment property wrapper
 
-    @AppEnvironment(StateModel.self) private var model
+    @Injected(StateModel.self) private var model
 
     let localState = LocalState(value: "")
 

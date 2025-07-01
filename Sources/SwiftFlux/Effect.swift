@@ -14,26 +14,3 @@ public protocol Effect {
     var condition: Condition { get }
     var body: Body { get }
 }
-
-extension Effect where Condition == Bool {
-    public static var always: Condition { true }
-    public static var never: Condition { false }
-}
-
-public protocol Condition {
-    func evaluate(store: Store) -> Bool
-}
-
-extension Never: Condition {
-    public func evaluate(store: Store) -> Bool { false }
-}
-
-extension Bool: Condition {
-    public func evaluate(store: Store) -> Bool { self }
-}
-
-public struct OnChange<State>: Condition {
-    public func evaluate(store: Store) -> Bool {
-        true
-    }
-}

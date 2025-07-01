@@ -1,5 +1,5 @@
 //
-//  Dispatching.swift
+//  Dispatcher.swift
 //  swift-flux
 //
 //  Created by Jack Zhao on 6/30/25.
@@ -8,11 +8,11 @@
 import Foundation
 
 @MainActor
-public protocol Dispatching {
+public protocol Dispatcher {
     var store: Store { get }
 }
 
-extension Dispatching {
+extension Dispatcher {
     public func dispatch(_ action: some Action) {
         store.dispatch(action)
     }

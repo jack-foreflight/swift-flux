@@ -1,5 +1,5 @@
 //
-//  AppView.swift
+//  StoreProvidingMacro.swift
 //  swift-flux
 //
 //  Created by Jack Zhao on 6/30/25.
@@ -9,7 +9,7 @@ import SwiftSyntax
 import SwiftSyntaxBuilder
 import SwiftSyntaxMacros
 
-public enum StoreViewMacro: MemberMacro {
+public enum StoreProvidingMacro: MemberMacro {
     private static let module = "SwiftFlux"
 
     public static func expansion(
@@ -21,7 +21,7 @@ public enum StoreViewMacro: MemberMacro {
         guard let structDecl = declaration.as(StructDeclSyntax.self),
             structDecl.inheritanceClause?.inheritedTypes.contains(where: { $0.type.trimmedDescription == "View" }) == true
         else {
-            throw MacroError("@StoreView can only be applied to structs conforming to View")
+            throw MacroError("@StoreProviding can only be applied to structs conforming to View")
         }
 
         let store: DeclSyntax =
@@ -32,7 +32,7 @@ public enum StoreViewMacro: MemberMacro {
     }
 }
 
-extension StoreViewMacro: ExtensionMacro {
+extension StoreProvidingMacro: ExtensionMacro {
     public static func expansion(
         of node: SwiftSyntax.AttributeSyntax,
         attachedTo declaration: some SwiftSyntax.DeclGroupSyntax,
@@ -40,8 +40,7 @@ extension StoreViewMacro: ExtensionMacro {
         conformingTo protocols: [SwiftSyntax.TypeSyntax],
         in context: some SwiftSyntaxMacros.MacroExpansionContext
     ) throws -> [SwiftSyntax.ExtensionDeclSyntax] {
-        let selectingConformance = try ExtensionDeclSyntax("extension \(type): \(raw: module).Selecting {}")
-        let dispatchingConformance = try ExtensionDeclSyntax("extension \(type): \(raw: module).Dispatching {}")
-        return [selectingConformance, dispatchingConformance]
+        let storeProvidingConformance = try ExtensionDeclSyntax("extension \(type): \(raw: module).StoreProviding {}")
+        return [storeProvidingConformance]
     }
 }

@@ -8,7 +8,7 @@
 import Foundation
 
 public struct Reduce<State: Sendable>: Action {
-    @AppEnvironment(State.self) private var state
+    @Injected(State.self) private var state
     private let operation: (State) -> Void
 
     init(_ operation: @escaping (State) -> Void) {

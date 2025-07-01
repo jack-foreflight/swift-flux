@@ -102,7 +102,7 @@ final class NestedState: Sendable, Identifiable {
 /// Level 1: Basic synchronous action that updates a single value
 @MainActor
 struct SimpleIncrementAction: Action {
-    @AppEnvironment(SimpleState.self) private var state
+    @Injected(SimpleState.self) private var state
 
     var body: some Action {
         Sync {
@@ -115,7 +115,7 @@ struct SimpleIncrementAction: Action {
 /// Level 1: Basic asynchronous action with minimal async work
 @MainActor
 struct SimpleAsyncAction: Action {
-    @AppEnvironment(SimpleState.self) private var state
+    @Injected(SimpleState.self) private var state
 
     var body: some Action {
         Async {
@@ -196,7 +196,7 @@ struct MultiStateAction: Action {
 /// Level 3: Complex state initialization with multiple properties
 @MainActor
 struct InitializeComplexStateAction: Action {
-    @AppEnvironment(ComplexState.self) private var state
+    @Injected(ComplexState.self) private var state
 
     @Sequential
     var body: some Action {
@@ -238,7 +238,7 @@ struct DataProcessingAction: Action {
 /// Level 3: Process items within a complex state
 @MainActor
 struct ProcessItemsAction: Action {
-    @AppEnvironment(ComplexState.self) private var state
+    @Injected(ComplexState.self) private var state
 
     var body: some Action {
         Async {
@@ -259,7 +259,7 @@ struct ProcessItemsAction: Action {
 /// Level 3: Metadata processing action
 @MainActor
 struct MetadataProcessingAction: Action {
-    @AppEnvironment(ComplexState.self) private var state
+    @Injected(ComplexState.self) private var state
 
     var body: some Action {
         Async {
@@ -306,7 +306,7 @@ struct DeepNestedAction: Action {
 /// Level 4: Initialize a nested hierarchy of states and actions
 @MainActor
 struct InitializeNestedHierarchyAction: Action {
-    @AppEnvironment(NestedState.self) private var state
+    @Injected(NestedState.self) private var state
 
     @Sequential
     var body: some Action {
@@ -327,7 +327,7 @@ struct InitializeNestedHierarchyAction: Action {
 /// Level 4: Create child states dynamically
 @MainActor
 struct CreateChildStatesAction: Action {
-    @AppEnvironment(NestedState.self) private var parentState
+    @Injected(NestedState.self) private var parentState
 
     @Parallel
     var body: some Action {
@@ -348,7 +348,7 @@ struct CreateChildStatesAction: Action {
 @MainActor
 struct CreateChildAction: Action {
     let childId: String
-    @AppEnvironment(NestedState.self) private var parentState
+    @Injected(NestedState.self) private var parentState
 
     var body: some Action {
         Async {
@@ -367,7 +367,7 @@ struct CreateChildAction: Action {
 /// Level 4: Process individual child state
 @MainActor
 struct ProcessChildStateAction: Action {
-    @AppEnvironment(NestedState.self) private var childState
+    @Injected(NestedState.self) private var childState
 
     var body: some Action {
         Async {
@@ -385,7 +385,7 @@ struct ProcessChildStateAction: Action {
 /// Level 4: Process all children with conditional logic
 @MainActor
 struct ProcessChildrenAction: Action {
-    @AppEnvironment(NestedState.self) private var state
+    @Injected(NestedState.self) private var state
 
     @Sequential
     var body: some Action {
@@ -406,7 +406,7 @@ struct ProcessChildrenAction: Action {
 /// Level 4: Conditional processing based on state
 @MainActor
 struct ConditionalProcessingAction: Action {
-    @AppEnvironment(NestedState.self) private var state
+    @Injected(NestedState.self) private var state
 
     @Parallel
     var body: some Action {
@@ -425,7 +425,7 @@ struct ConditionalProcessingAction: Action {
 /// Level 4: Processing based on depth
 @MainActor
 struct DepthBasedProcessingAction: Action {
-    @AppEnvironment(NestedState.self) private var state
+    @Injected(NestedState.self) private var state
 
     var body: some Action {
         Async {
@@ -438,7 +438,7 @@ struct DepthBasedProcessingAction: Action {
 /// Level 4: Processing for children
 @MainActor
 struct ChildrenProcessingAction: Action {
-    @AppEnvironment(NestedState.self) private var state
+    @Injected(NestedState.self) private var state
 
     var body: some Action {
         Async {
@@ -453,7 +453,7 @@ struct ChildrenProcessingAction: Action {
 /// Level 4: Base processing action
 @MainActor
 struct BaseProcessingAction: Action {
-    @AppEnvironment(NestedState.self) private var state
+    @Injected(NestedState.self) private var state
 
     var body: some Action {
         Sync {
@@ -465,7 +465,7 @@ struct BaseProcessingAction: Action {
 /// Level 4: Deep processing with multiple levels
 @MainActor
 struct DeepProcessingAction: Action {
-    @AppEnvironment(NestedState.self) private var state
+    @Injected(NestedState.self) private var state
 
     @Sequential
     var body: some Action {
@@ -478,7 +478,7 @@ struct DeepProcessingAction: Action {
 /// Level 4: First level of deep processing
 @MainActor
 struct FirstLevelDeepAction: Action {
-    @AppEnvironment(NestedState.self) private var state
+    @Injected(NestedState.self) private var state
 
     @Parallel
     var body: some Action {
@@ -494,7 +494,7 @@ struct FirstLevelDeepAction: Action {
 /// Level 4: Second level of deep processing
 @MainActor
 struct SecondLevelDeepAction: Action {
-    @AppEnvironment(NestedState.self) private var state
+    @Injected(NestedState.self) private var state
 
     var body: some Action {
         NestedComputationAction()
@@ -504,7 +504,7 @@ struct SecondLevelDeepAction: Action {
 /// Level 4: Third level of deep processing
 @MainActor
 struct ThirdLevelDeepAction: Action {
-    @AppEnvironment(NestedState.self) private var state
+    @Injected(NestedState.self) private var state
 
     @Sequential
     var body: some Action {
@@ -516,7 +516,7 @@ struct ThirdLevelDeepAction: Action {
 /// Level 4: Nested computation action
 @MainActor
 struct NestedComputationAction: Action {
-    @AppEnvironment(NestedState.self) private var state
+    @Injected(NestedState.self) private var state
 
     var body: some Action {
         Async {
@@ -534,7 +534,7 @@ struct NestedComputationAction: Action {
 /// Level 4: Final deep action
 @MainActor
 struct FinalDeepAction: Action {
-    @AppEnvironment(NestedState.self) private var state
+    @Injected(NestedState.self) private var state
 
     var body: some Action {
         Async {
@@ -547,7 +547,7 @@ struct FinalDeepAction: Action {
 /// Level 4: Consolidate all results
 @MainActor
 struct ConsolidateResultsAction: Action {
-    @AppEnvironment(NestedState.self) private var state
+    @Injected(NestedState.self) private var state
 
     var body: some Action {
         Async {
@@ -611,7 +611,7 @@ struct SystemInitializationAction: Action {
 /// Level 5: Initialize orchestrator with complex setup
 @MainActor
 struct InitializeOrchestratorAction: Action {
-    @AppEnvironment(ComplexState.self) private var state
+    @Injected(ComplexState.self) private var state
 
     @Sequential
     var body: some Action {
@@ -670,7 +670,7 @@ struct InitializeAllProcessingStatesAction: Action {
 @MainActor
 struct InitializeProcessingStateAction: Action {
     let index: Int
-    @AppEnvironment(NestedState.self) private var state
+    @Injected(NestedState.self) private var state
 
     @Sequential
     var body: some Action {
@@ -695,7 +695,7 @@ struct InitializeProcessingStateAction: Action {
 /// Level 5: Processing for even-indexed states
 @MainActor
 struct EvenIndexProcessingAction: Action {
-    @AppEnvironment(NestedState.self) private var state
+    @Injected(NestedState.self) private var state
 
     var body: some Action {
         Async {
@@ -711,7 +711,7 @@ struct EvenIndexProcessingAction: Action {
 /// Level 5: Processing for odd-indexed states
 @MainActor
 struct OddIndexProcessingAction: Action {
-    @AppEnvironment(NestedState.self) private var state
+    @Injected(NestedState.self) private var state
 
     var body: some Action {
         Async {
@@ -750,7 +750,7 @@ struct MassiveParallelProcessingAction: Action {
 /// Level 5: Complex orchestrator processing
 @MainActor
 struct ComplexOrchestratorProcessingAction: Action {
-    @AppEnvironment(ComplexState.self) private var state
+    @Injected(ComplexState.self) private var state
 
     @Sequential
     var body: some Action {
@@ -782,7 +782,7 @@ struct ComplexOrchestratorProcessingAction: Action {
 /// Level 5: Data aggregation within complex processing
 @MainActor
 struct DataAggregationAction: Action {
-    @AppEnvironment(ComplexState.self) private var state
+    @Injected(ComplexState.self) private var state
 
     var body: some Action {
         Async {
@@ -835,7 +835,7 @@ struct MassiveStateProcessingAction: Action {
 @MainActor
 struct IntensiveProcessingAction: Action {
     let stateIndex: Int
-    @AppEnvironment(NestedState.self) private var state
+    @Injected(NestedState.self) private var state
 
     @Sequential
     var body: some Action {
@@ -860,7 +860,7 @@ struct IntensiveProcessingAction: Action {
 @MainActor
 struct MultiPhaseProcessingAction: Action {
     let phase: Int
-    @AppEnvironment(NestedState.self) private var state
+    @Injected(NestedState.self) private var state
 
     var body: some Action {
         Async {
@@ -949,7 +949,7 @@ struct AnalyzeSystemStateAction: Action {
 /// Level 5: Analyze complex state
 @MainActor
 struct StateAnalysisAction: Action {
-    @AppEnvironment(ComplexState.self) private var state
+    @Injected(ComplexState.self) private var state
 
     var body: some Action {
         Async {
@@ -973,7 +973,7 @@ struct StateAnalysisAction: Action {
 /// Level 5: Analyze coordination state
 @MainActor
 struct CoordinationAnalysisAction: Action {
-    @AppEnvironment(SimpleState.self) private var state
+    @Injected(SimpleState.self) private var state
 
     var body: some Action {
         Async {
@@ -1003,7 +1003,7 @@ struct GenerateDynamicActionsAction: Action {
 /// Level 5: Configure dynamic actions
 @MainActor
 struct DynamicActionConfigurationAction: Action {
-    @AppEnvironment(ComplexState.self) private var state
+    @Injected(ComplexState.self) private var state
 
     var body: some Action {
         Async {
@@ -1031,7 +1031,7 @@ struct DynamicActionConfigurationAction: Action {
 /// Level 5: Conditional dynamic action
 @MainActor
 struct ConditionalDynamicAction: Action {
-    @AppEnvironment(ComplexState.self) private var state
+    @Injected(ComplexState.self) private var state
 
     @Parallel
     var body: some Action {
@@ -1050,7 +1050,7 @@ struct ConditionalDynamicAction: Action {
 /// Level 5: Extra dynamic processing
 @MainActor
 struct ExtraDynamicProcessingAction: Action {
-    @AppEnvironment(ComplexState.self) private var state
+    @Injected(ComplexState.self) private var state
 
     var body: some Action {
         Async {
@@ -1069,7 +1069,7 @@ struct ExtraDynamicProcessingAction: Action {
 /// Level 5: High counter dynamic action
 @MainActor
 struct HighCounterDynamicAction: Action {
-    @AppEnvironment(ComplexState.self) private var state
+    @Injected(ComplexState.self) private var state
 
     var body: some Action {
         Async {
@@ -1088,7 +1088,7 @@ struct HighCounterDynamicAction: Action {
 /// Level 5: Base dynamic action
 @MainActor
 struct BaseDynamicAction: Action {
-    @AppEnvironment(ComplexState.self) private var state
+    @Injected(ComplexState.self) private var state
 
     var body: some Action {
         Sync {
@@ -1146,7 +1146,7 @@ struct CrossSystemSynchronizationAction: Action {
 /// Level 5: Synchronize orchestrator
 @MainActor
 struct OrchestratorSyncAction: Action {
-    @AppEnvironment(ComplexState.self) private var state
+    @Injected(ComplexState.self) private var state
 
     var body: some Action {
         Async {
@@ -1189,7 +1189,7 @@ struct ProcessingStatesSyncAction: Action {
 @MainActor
 struct ProcessingStateSyncAction: Action {
     let index: Int
-    @AppEnvironment(NestedState.self) private var state
+    @Injected(NestedState.self) private var state
 
     var body: some Action {
         Async {
@@ -1204,7 +1204,7 @@ struct ProcessingStateSyncAction: Action {
 /// Level 5: Synchronize coordination
 @MainActor
 struct CoordinationSyncAction: Action {
-    @AppEnvironment(SimpleState.self) private var state
+    @Injected(SimpleState.self) private var state
 
     var body: some Action {
         Async {
@@ -1315,7 +1315,7 @@ struct DataDistributionAction: Action {
 /// Level 5: Distribute data to orchestrator
 @MainActor
 struct DistributeToOrchestratorAction: Action {
-    @AppEnvironment(ComplexState.self) private var state
+    @Injected(ComplexState.self) private var state
 
     var body: some Action {
         Async {
@@ -1335,7 +1335,7 @@ struct DistributeToOrchestratorAction: Action {
 /// Level 5: Distribute data to coordination
 @MainActor
 struct DistributeToCoordinationAction: Action {
-    @AppEnvironment(SimpleState.self) private var state
+    @Injected(SimpleState.self) private var state
 
     var body: some Action {
         Async {
@@ -1373,7 +1373,7 @@ struct SystemValidationAction: Action {
 /// Level 5: Validate orchestrator state
 @MainActor
 struct ValidateOrchestratorAction: Action {
-    @AppEnvironment(ComplexState.self) private var state
+    @Injected(ComplexState.self) private var state
 
     var body: some Action {
         Async {
@@ -1416,7 +1416,7 @@ struct ValidateProcessingStatesAction: Action {
 @MainActor
 struct ValidateProcessingStateAction: Action {
     let index: Int
-    @AppEnvironment(NestedState.self) private var state
+    @Injected(NestedState.self) private var state
 
     var body: some Action {
         Async {
@@ -1431,7 +1431,7 @@ struct ValidateProcessingStateAction: Action {
 /// Level 5: Validate coordination state
 @MainActor
 struct ValidateCoordinationAction: Action {
-    @AppEnvironment(SimpleState.self) private var state
+    @Injected(SimpleState.self) private var state
 
     var body: some Action {
         Async {
@@ -1488,7 +1488,7 @@ struct FinalDataConsolidationAction: Action {
 /// Level 5: Consolidate orchestrator data
 @MainActor
 struct ConsolidateOrchestratorDataAction: Action {
-    @AppEnvironment(ComplexState.self) private var state
+    @Injected(ComplexState.self) private var state
 
     var body: some Action {
         Async {
@@ -1514,7 +1514,7 @@ struct ConsolidateOrchestratorDataAction: Action {
 /// Level 5: Consolidate coordination data
 @MainActor
 struct ConsolidateCoordinationDataAction: Action {
-    @AppEnvironment(SimpleState.self) private var state
+    @Injected(SimpleState.self) private var state
 
     var body: some Action {
         Async {

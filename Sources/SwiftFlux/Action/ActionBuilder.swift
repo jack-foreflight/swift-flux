@@ -79,33 +79,3 @@ public struct ActionGroup<Builder: ActionBuilder>: ActionBuilder {
         }
     }
 }
-
-/// Group action that executes actions sequentially in order
-@resultBuilder
-public struct Sequential: ActionBuilder {
-    public let actions: [any Action]
-    public var body: some Action { Operation.sequential(actions) }
-
-    public init(_ actions: [any Action]) {
-        self.actions = actions
-    }
-
-    public init(@Sequential _ group: () -> Self) {
-        self.actions = group().actions
-    }
-}
-
-/// Group action that executes actions concurrently in parallel
-@resultBuilder
-public struct Parallel: ActionBuilder {
-    public let actions: [any Action]
-    public var body: some Action { Operation.parallel(actions) }
-
-    public init(_ actions: [any Action]) {
-        self.actions = actions
-    }
-
-    public init(@Parallel _ group: () -> Self) {
-        self.actions = group().actions
-    }
-}
