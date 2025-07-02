@@ -57,7 +57,7 @@ import Testing
 /// Basic state model for level 1 testing - single value tracking
 @MainActor
 @Observable
-final class SimpleState: Sendable, Identifiable {
+final class SimpleState: SharedState, Identifiable {
     let id: String
     var value: Int = 0
     var message: String = ""
@@ -70,7 +70,7 @@ final class SimpleState: Sendable, Identifiable {
 /// Complex state model for advanced testing - multiple interconnected values
 @MainActor
 @Observable
-final class ComplexState: Sendable, Identifiable {
+final class ComplexState: SharedState, Identifiable {
     let id: String
     var counter: Int = 0
     var items: [String] = []
@@ -86,7 +86,7 @@ final class ComplexState: Sendable, Identifiable {
 /// Nested state model for hierarchical testing
 @MainActor
 @Observable
-final class NestedState: Sendable, Identifiable {
+final class NestedState: SharedState, Identifiable {
     let id: String
     var parent: String = ""
     var children: [String] = []

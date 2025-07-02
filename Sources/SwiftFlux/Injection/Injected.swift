@@ -13,38 +13,30 @@ public struct Injected<Value> {
     public var wrappedValue: Value { value() }
 
     public init(_ keyPath: KeyPath<InjectionValues, Value>) {
-        self.value = { InjectionValues.current[keyPath: keyPath] }
+        self.value = { Injected[keyPath] }
     }
 
     public init<Key: Injection>(_ key: Key.Type) where Value == Key.Value {
-        self.value = { InjectionValues.current[key] }
-    }
-
-    public init(
-        _ store: Store.Type,
-        file: StaticString = #file,
-        line: UInt = #line
-    ) where Value == Store {
-        self.value = { InjectionValues.current[store, file, line] }
+        self.value = { Injected[key] }
     }
 
     public init(
         _ state: Value.Type,
         file: StaticString = #file,
         line: UInt = #line
-    ) where Value: Sendable {
-        self.value = { InjectionValues.current[state, file, line] }
-    }
-
-    public static subscript<Key: Injection>(key: Key.Type) -> Value where Key.Value == Value {
-        InjectionValues.current[key]
+    ) where Value: SharedState {
+        self.value = { Injected[state, file, line] }
     }
 
     public static subscript(keyPath: KeyPath<InjectionValues, Value>) -> Value {
         InjectionValues.current[keyPath: keyPath]
     }
 
-    public static subscript(state: Value.Type, file: StaticString = #file, line: UInt = #line) -> Value where Value: Sendable {
+    public static subscript<Key: Injection>(key: Key.Type) -> Value where Key.Value == Value {
+        InjectionValues.current[key]
+    }
+
+    public static subscript(state: Value.Type, file: StaticString = #file, line: UInt = #line) -> Value where Value: SharedState {
         InjectionValues.current[state, file, line]
     }
 }

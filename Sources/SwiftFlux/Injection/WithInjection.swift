@@ -126,7 +126,7 @@ public func withInjection<Result: Sendable>(
 }
 
 @discardableResult
-public func withState<State: Sendable, Result>(
+public func withState<State: SharedState, Result>(
     _ state: State,
     file: StaticString = #file,
     line: UInt = #line,
@@ -141,7 +141,7 @@ public func withState<State: Sendable, Result>(
 
 @MainActor
 @discardableResult
-public func withState<State: Sendable, Result: Sendable>(
+public func withState<State: SharedState, Result: Sendable>(
     _ state: State,
     file: StaticString = #file,
     line: UInt = #line,

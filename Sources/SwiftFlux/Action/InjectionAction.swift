@@ -16,7 +16,7 @@ public struct InjectionAction<Body: Action>: Action {
         self.build = { withStore(store) { build() } }
     }
 
-    init<State: Sendable>(state: State, build: @escaping () -> Body) {
+    init<State: SharedState>(state: State, build: @escaping () -> Body) {
         self.injection = withState(state) { InjectionValues.current }
         self.build = { withState(state) { build() } }
     }
@@ -47,7 +47,7 @@ extension Action {
         InjectionAction(store: store) { self }
     }
 
-    public func injecting<State: Sendable>(_ state: State) -> some Action {
+    public func injecting<State: SharedState>(_ state: State) -> some Action {
         InjectionAction(state: state) { self }
     }
 
@@ -69,7 +69,7 @@ extension Action {
         InjectionAction(store: store) { self }
     }
 
-    public func environment<State: Sendable>(_ state: State) -> some Action {
+    public func environment<State: SharedState>(_ state: State) -> some Action {
         InjectionAction(state: state) { self }
     }
 

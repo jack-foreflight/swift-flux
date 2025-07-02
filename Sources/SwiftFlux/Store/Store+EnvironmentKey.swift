@@ -7,9 +7,7 @@
 
 import SwiftUI
 
-extension Store: EnvironmentKey {
-    public static nonisolated let defaultValue: Store = Store.build()
-}
+extension Store: EnvironmentKey {}
 
 extension EnvironmentValues {
     public var store: Store {

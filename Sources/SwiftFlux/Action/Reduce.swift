@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Reduce<State: Sendable>: Action {
+public struct Reduce<State: SharedState>: Action {
     @Injected(State.self) private var state
     private let operation: (State) -> Void
 

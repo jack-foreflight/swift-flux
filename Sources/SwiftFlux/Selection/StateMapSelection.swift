@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct StateMapSelection<SharedState: Sendable, State>: Selection {
+public struct StateMapSelection<SharedState: SwiftFlux.SharedState, State>: Selection {
     @Injected(SharedState.self) private var state
     private let map: (SharedState) -> State
 

@@ -7,7 +7,9 @@
 
 import Foundation
 
-extension Store: Injection {}
+extension Store: Injection {
+    public static nonisolated let defaultValue: Store = Store.build()
+}
 
 extension InjectionValues {
     public var store: Store {

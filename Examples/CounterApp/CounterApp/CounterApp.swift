@@ -15,7 +15,7 @@ import SwiftUI
 /// StateModel acts as a sample model that we will be passing around through the Views and the actions. Note that it conforms to SharedState so we are able to pass it around without explicitly defining the EnvironmentKey and the AppEnvironmentKey - the caveat being that if the Object is not able to be resolved, we through an error.
 
 @Observable
-public final class StateModel: Sendable, Identifiable {
+public final class StateModel: SharedState, Identifiable {
 
     /// We use the id attribute in our testing to identify which instance of the StateModel we are currently using.
 
@@ -28,18 +28,18 @@ public final class StateModel: Sendable, Identifiable {
 
 /// Our testbed is the CounterApp. This is where we declare the store and are testing the action dispatch.
 
+extension Store: @retroactive OverrideInjection {
+    public static nonisolated let overrideValue: Store = Store.configure().withState(StateModel(id: "1")).build()
+}
+
 @main
 struct CounterApp: App {
     /// The Store is initialized within the root application
-    @State private var store = Store()
+    @Injected(Store.self) private var store
 
     var body: some Scene {
         WindowGroup {
-            Button {
-                store.dispatch(OuterAction())
-            } label: {
-                Text("Dispatch Action")
-            }
+            MiddleView()
         }
         .environment(\.store, store)
     }

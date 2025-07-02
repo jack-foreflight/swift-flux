@@ -27,14 +27,14 @@ public class StoreBuilder {
         return self
     }
 
-    public func withState<each State: Sendable>(_ state: repeat each State) -> StoreBuilder {
+    public func withState<each State: SharedState>(_ state: repeat each State) -> StoreBuilder {
         for state in repeat each state {
             injectionValues.register(state)
         }
         return self
     }
 
-    public func withState<each State: Sendable>(@StateBuilder _ builder: @escaping () -> (repeat each State)) -> StoreBuilder {
+    public func withState<each State: SharedState>(@StateBuilder _ builder: @escaping () -> (repeat each State)) -> StoreBuilder {
         for state in repeat each builder() {
             injectionValues.register(state)
         }
@@ -61,7 +61,7 @@ public class StoreBuilder {
 
     @resultBuilder
     struct StateBuilder {
-        static func buildBlock<each State: Sendable>(_ components: repeat each State) -> (repeat each State) {
+        static func buildBlock<each State: SharedState>(_ components: repeat each State) -> (repeat each State) {
             (repeat each components)
         }
     }

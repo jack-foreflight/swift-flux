@@ -8,7 +8,7 @@
 import Foundation
 import os
 
-public struct DidChangeEvent<State: Sendable & Equatable, Effect: SwiftFlux.Effect>: Event {
+public struct DidChangeEvent<State: SharedState & Equatable, Effect: SwiftFlux.Effect>: Event {
     private let previous: OSAllocatedUnfairLock<State?> = .init(initialState: nil)
     @Injected(State.self) private var state
     @Injected(Store.self) private var store

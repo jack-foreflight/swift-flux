@@ -51,7 +51,7 @@ extension Binder {
         }
     }
 
-    public func bind<State: Sendable>(_ type: State.Type, _ action: some Action) -> Binding<State> {
+    public func bind<State: SwiftFlux.SharedState>(_ type: State.Type, _ action: some Action) -> Binding<State> {
         Binding {
             store.select(StateTypeSelection())
         } set: { newValue in
@@ -59,7 +59,7 @@ extension Binder {
         }
     }
 
-    public func bind<State: Sendable>(_ type: State.Type, _ action: @escaping (State) -> some Action) -> Binding<State> {
+    public func bind<State: SwiftFlux.SharedState>(_ type: State.Type, _ action: @escaping (State) -> some Action) -> Binding<State> {
         Binding {
             store.select(StateTypeSelection())
         } set: { newValue in
@@ -67,7 +67,7 @@ extension Binder {
         }
     }
 
-    public func bind<SharedState: Sendable, State>(_ map: @escaping (SharedState) -> State, _ action: some Action) -> Binding<State> {
+    public func bind<SharedState: SwiftFlux.SharedState, State>(_ map: @escaping (SharedState) -> State, _ action: some Action) -> Binding<State> {
         Binding {
             store.select(StateMapSelection(map: map))
         } set: { newValue in
@@ -75,7 +75,7 @@ extension Binder {
         }
     }
 
-    public func bind<SharedState: Sendable, State>(_ map: @escaping (SharedState) -> State, _ action: @escaping (State) -> some Action) -> Binding<State> {
+    public func bind<SharedState: SwiftFlux.SharedState, State>(_ map: @escaping (SharedState) -> State, _ action: @escaping (State) -> some Action) -> Binding<State> {
         Binding {
             store.select(StateMapSelection(map: map))
         } set: { newValue in
@@ -83,7 +83,7 @@ extension Binder {
         }
     }
 
-    public func bind<SharedState: Sendable, State>(_ keyPath: KeyPath<SharedState, State>, _ action: some Action) -> Binding<State> {
+    public func bind<SharedState: SwiftFlux.SharedState, State>(_ keyPath: KeyPath<SharedState, State>, _ action: some Action) -> Binding<State> {
         Binding {
             store.select(StateKeyPathSelection(keyPath: keyPath))
         } set: { newValue in
@@ -91,7 +91,7 @@ extension Binder {
         }
     }
 
-    public func bind<SharedState: Sendable, State>(_ keyPath: KeyPath<SharedState, State>, _ action: @escaping (State) -> some Action) -> Binding<State> {
+    public func bind<SharedState: SwiftFlux.SharedState, State>(_ keyPath: KeyPath<SharedState, State>, _ action: @escaping (State) -> some Action) -> Binding<State> {
         Binding {
             store.select(StateKeyPathSelection(keyPath: keyPath))
         } set: { newValue in

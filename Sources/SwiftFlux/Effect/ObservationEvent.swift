@@ -10,7 +10,7 @@ import Foundation
 #if canImport(Observation)
     import Observation
 
-    public struct ObservationEvent<State: Observable & Sendable, Effect: SwiftFlux.Effect>: Event {
+    public struct ObservationEvent<State: Observable & SharedState, Effect: SwiftFlux.Effect>: Event {
         @Injected(State.self) private var state
         @Injected(Store.self) private var store
         @Injected(\.events) private var events

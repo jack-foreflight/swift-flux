@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct StateKeyPathSelection<SharedState: Sendable, State>: Selection {
+public struct StateKeyPathSelection<SharedState: SwiftFlux.SharedState, State>: Selection {
     @Injected(SharedState.self) private var state
     private let keyPath: KeyPath<SharedState, State>
 

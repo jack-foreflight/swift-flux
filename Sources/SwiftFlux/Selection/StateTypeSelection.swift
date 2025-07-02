@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct StateTypeSelection<State: Sendable>: Selection {
+public struct StateTypeSelection<State: SharedState>: Selection {
     @Injected(State.self) private var state
     public init() {}
     public func select() -> State { state }

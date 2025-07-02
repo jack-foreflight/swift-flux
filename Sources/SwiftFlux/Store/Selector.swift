@@ -21,15 +21,15 @@ extension Selector {
         store.select(KeyPathSelection(keyPath: keyPath))
     }
 
-    public func select<State: Sendable>(_ type: State.Type) -> State {
+    public func select<State: SwiftFlux.SharedState>(_ type: State.Type) -> State {
         store.select(StateTypeSelection())
     }
 
-    public func select<SharedState: Sendable, State>(_ map: @escaping (SharedState) -> State) -> State {
+    public func select<SharedState: SwiftFlux.SharedState, State>(_ map: @escaping (SharedState) -> State) -> State {
         store.select(StateMapSelection(map: map))
     }
 
-    public func select<SharedState: Sendable, State>(_ keyPath: KeyPath<SharedState, State>) -> State {
+    public func select<SharedState: SwiftFlux.SharedState, State>(_ keyPath: KeyPath<SharedState, State>) -> State {
         store.select(StateKeyPathSelection(keyPath: keyPath))
     }
 }

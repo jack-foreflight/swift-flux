@@ -10,7 +10,7 @@ import Foundation
 #if canImport(Combine)
     import Combine
 
-    public struct ObjectWillChangeEvent<State: ObservableObject & Sendable, Effect: SwiftFlux.Effect>: Event {
+    public struct ObjectWillChangeEvent<State: ObservableObject & SharedState, Effect: SwiftFlux.Effect>: Event {
         @Injected(State.self) private var state
         @Injected(Store.self) private var store
         @Injected(\.events) private var events
