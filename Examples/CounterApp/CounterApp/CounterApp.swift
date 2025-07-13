@@ -4,143 +4,414 @@
 //
 //
 
-import SwiftFlux
+import FluxObservation
 import SwiftUI
 
-/// We've defined an architecture based heavily on SwiftUI's declaritive syntax to handle the logic side of the application. The main components are as follows:
-/// - Store: responsible for receiving dispatched actions and coordinating them
-/// - State: The state should live within the Store. Currently this is unimplemented but a sample state in this case would be the StateModel we've defined below.
-/// - Action: The core of the architecture that defines how state should be updated and any side effects. Actions can be thought of the "View" 's of the architecture in that you define the action body as to what happens. Actions can also be composed of other Actions and you would build their body's similar to how SwiftUI allows you to compose Views.
-
-/// StateModel acts as a sample model that we will be passing around through the Views and the actions. Note that it conforms to SharedState so we are able to pass it around without explicitly defining the EnvironmentKey and the AppEnvironmentKey - the caveat being that if the Object is not able to be resolved, we through an error.
-
-@Observable
-public final class StateModel: SharedState, Identifiable {
-
-    /// We use the id attribute in our testing to identify which instance of the StateModel we are currently using.
-
-    public let id: String
-
-    init(id: String) {
-        self.id = id
+extension View {
+    func randomBackground() -> some View {
+        self.background(
+            Color(
+                red: .random(in: 0...1),
+                green: .random(in: 0...1),
+                blue: .random(in: 0...1)
+            )
+        )
     }
-}
-
-/// Our testbed is the CounterApp. This is where we declare the store and are testing the action dispatch.
-
-extension Store: @retroactive OverrideInjection {
-    public static nonisolated let overrideValue: Store = Store.configure().withState(StateModel(id: "1")).build()
 }
 
 @main
 struct CounterApp: App {
-    /// The Store is initialized within the root application
-    @Injected(Store.self) private var store
+    @State private var appState = AppState()
 
     var body: some Scene {
         WindowGroup {
-            MiddleView()
+            NavigationStack {
+                MainTabView()
+                    .environment(appState)
+            }
         }
-        .environment(\.store, store)
     }
 }
 
-struct MiddleView: View {
+@Observable
+public final class TimerState {
+    public var seconds: Int = 0
+    public var isRunning: Bool = false
+    private var timer: Timer?
+
+    public func start() {
+        guard !isRunning else { return }
+        isRunning = true
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+            self.seconds += 1
+        }
+    }
+
+    public func stop() {
+        isRunning = false
+        timer?.invalidate()
+        timer = nil
+    }
+
+    public func reset() {
+        stop()
+        seconds = 0
+    }
+}
+
+@Observable
+public final class CounterState {
+    public var count: Int = 0
+    public var step: Int = 1
+    public var history: [Int] = []
+
+    public var isEven: Bool {
+        count % 2 == 0
+    }
+
+    public var isPrime: Bool {
+        guard count > 1 else { return false }
+        for i in 2..<count {
+            if count % i == 0 {
+                return false
+            }
+        }
+        return true
+    }
+
+    public func increment() {
+        history.append(count)
+        count += step
+    }
+
+    public func decrement() {
+        history.append(count)
+        count -= step
+    }
+
+    public func reset() {
+        history.append(count)
+        count = 0
+    }
+
+    public func undo() {
+        guard let lastValue = history.popLast() else { return }
+        count = lastValue
+    }
+}
+
+@Observable
+public final class SettingsState {
+    public var theme: Theme = .system
+    public var animations: Bool = true
+    public var notifications: Bool = true
+
+    public enum Theme: String, CaseIterable {
+        case light = "Light"
+        case dark = "Dark"
+        case system = "System"
+    }
+}
+
+@Observable
+public final class AppState {
+    public var counter = CounterState()
+    public var timer = TimerState()
+    public var settings = SettingsState()
+
+    public var totalInteractions: Int = 0
+
+    public func recordInteraction() {
+        totalInteractions += 1
+    }
+}
+
+@ObservationTracking
+struct MainTabView: View {
+    @EnvironmentObject var appState: AppState
+
     var body: some View {
-        SubView()
+        TabView {
+            CounterTab()
+                .tabItem {
+                    Image(systemName: "plus.circle.fill")
+                    Text("Counter")
+                }
+
+            TimerTab()
+                .tabItem {
+                    Image(systemName: "timer")
+                    Text("Timer")
+                }
+
+            SettingsTab()
+                .tabItem {
+                    Image(systemName: "gear")
+                    Text("Settings")
+                }
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Text("Interactions: \(appState.totalInteractions)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
     }
 }
 
-@StoreProviding
-struct SubView: View {
+@ObservationTracking
+struct CounterTab: View {
+    @EnvironmentObject var appState: AppState
+
+    private var counter: CounterState {
+        appState.counter
+    }
+
     var body: some View {
-        Button {
-            dispatch(OuterAction())
-        } label: {
-            Text(select(StateModel.self).id)
+        NavigationView {
+            VStack(spacing: 20) {
+                VStack {
+                    Text("\(counter.count)")
+                        .font(.system(size: 72, weight: .light, design: .monospaced))
+                        .foregroundColor(counter.isEven ? .blue : .red)
+                        .animation(.easeInOut, value: counter.count)
+
+                    HStack {
+                        if counter.isEven {
+                            Label("Even", systemImage: "checkmark.circle.fill")
+                                .foregroundColor(.blue)
+                        }
+                        if counter.isPrime {
+                            Label("Prime", systemImage: "star.fill")
+                                .foregroundColor(.yellow)
+                        }
+                    }
+                    .font(.caption)
+                }
+
+                HStack(spacing: 20) {
+                    Button {
+                        counter.decrement()
+                        appState.recordInteraction()
+                    } label: {
+                        Image(systemName: "minus")
+                            .font(.title)
+                    }
+                    .buttonStyle(.borderedProminent)
+
+                    Button {
+                        counter.increment()
+                        appState.recordInteraction()
+                    } label: {
+                        Image(systemName: "plus")
+                            .font(.title)
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+
+                StepControlView()
+
+                VStack {
+                    HStack {
+                        Button("Reset") {
+                            counter.reset()
+                            appState.recordInteraction()
+                        }
+                        .buttonStyle(.bordered)
+
+                        Button("Undo") {
+                            counter.undo()
+                            appState.recordInteraction()
+                        }
+                        .buttonStyle(.bordered)
+                        .disabled(counter.history.isEmpty)
+                    }
+
+                    if !counter.history.isEmpty {
+                        Text("History: \(counter.history.suffix(5).map(String.init).joined(separator: ", "))")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                Spacer()
+            }
+            .padding()
+            .navigationTitle("Counter")
         }
     }
 }
 
-/// Actions:
-/// We are going to be testing with a basic action flow with composed Actions. OuterAction describes one to many actions within its body - in this case, we only have MiddleAction which has a modifier "environment" which we've defined in Action.swift
+struct StepControlView: View {
+    @EnvironmentObject var appState: AppState
 
-struct OuterAction: Action {
-    let state = StateModel(id: "default")
-
-    var body: some Action {
-        MiddleAction()
-
-            /// The environment modifier should mimic the SwiftUI environment modifier in that it will apply the environment to the entire scope of MiddleAction. This should also cascade down the action hierarchy so that "children" of MiddleAction also inherit this environment
-
-            .environment(state)
-    }
-}
-
-struct MiddleAction: Action {
-    /// We are defining two additional states here that will be passed down to portions of the MiddleAction body, specifically the InnerActions
-
-    let stateA = StateModel(id: "A")
-    let stateB = StateModel(id: "B")
-
-    /// Note that we've decorated this Action body with the resultBuilder @Parallel. This means that the contents of this Action should be executed in Parallel and if needed, should await the completion of all of the Actions for the Parallel action to complete.
-
-    @Sequential
-    var body: some Action {
-        /// The execution of this InnerAction should operate with StateModel(id: "default") as we are not injecting any override state here. This should inherit from the parent.
-        InnerAction()
-
-        /// The execution of this InnerAction should operate on StateModel(id: "A") as this state is explicitly passed to this InnerAction via the environment modifier.
-        InnerAction()
-            .environment(stateA)
-
-        /// The execution of this InnerAction should operate on StateModel(id: "B") as this state is explicitly passed to this InnerAction via the environment modifier.
-        InnerAction()
-            .environment(stateB)
-    }
-}
-
-struct InnerAction: Action {
-    /// We use the property wrapper @AppEnvironment to access environment values similarly to how SwiftUI allows you to access scoped instances of Environment with the @Environment property wrapper
-
-    @Injected(StateModel.self) private var model
-
-    let localState = LocalState(value: "")
-
-    /// In this action body, we have defined an Async block which will allow you to execute async functionality. In this case, we are printing out the id of the environment model. We add a sleep here to simulate some asynchronous work and print out the model.id at the end. Since we are within a scoped instance of this Async work, the model.id should remain the same throughout the action.
-
-    var body: some Action {
-        Async {
-            localState.value = model.id
-            print("start - \(model.id)")
-            try await Task.sleep(for: .seconds(1))
-            print("end - EnvironmentState: \(model.id) LocalState: \(localState.value)")
-        }
+    private var counter: CounterState {
+        appState.counter
     }
 
-    class LocalState {
-        var value: String
+    var body: some View {
+        WithObservationTracking {
+            VStack {
+                Text("Step: \(counter.step)")
+                    .font(.headline)
 
-        init(value: String) {
-            self.value = value
+                HStack {
+                    Button("1") { counter.step = 1 }
+                        .buttonStyle(.bordered)
+                        .tint(counter.step == 1 ? .primary : .secondary)
+
+                    Button("5") { counter.step = 5 }
+                        .buttonStyle(.bordered)
+                        .tint(counter.step == 5 ? .primary : .secondary)
+
+                    Button("10") { counter.step = 10 }
+                        .buttonStyle(.bordered)
+                        .tint(counter.step == 10 ? .primary : .secondary)
+                }
+            }
         }
     }
 }
 
-/// Expectations:
-/// The output of tapping on the Button should be:
-/// start - default
-/// start - A
-/// start - B
-/// end - EnvironmentState: A LocalState: A
-/// end - EnvironmentState: default LocalState: default
-/// end - EnvironmentState: B LocalState: B
-/// **Note**: that for the "end" evaluations, the order of the statements is not deterministic because this will be based on the scheduling of the Tasks. But the EnvironmentState should always match what was passed in
+@ObservationTracking
+struct TimerTab: View {
+    @EnvironmentObject var appState: AppState
 
-/// Objectives:
-/// The test simulated above is a very basic flow of how the architecture should behave. On a scale of 1-5 in terms of complexity, I would place this at a solid 2. I need a comprehensive test suite that will test all scenarios from level 1 to level 5 where level 5 would include highly nested action composition and data flow. The test suite should include State and Action definitions and should utilize the Store to handle the dispatching of actions.
-/// - When running into swift concurrency compiliation errors, default to utilizing the @MainActor and then exploring other options for sendability as a backup.
-/// - Ask clarifying questions if needed to proceed with your test suite creation
-/// - ONLY operate within the framework for foundational code, if a supplemental type needs to be created to assist with the semantics, then ask me prior to implementation.
-/// - Use this file as a reference for how you should structure your tests and actions
-/// - Provide comments and documentation on all tests
+    private var timer: TimerState {
+        appState.timer
+    }
+
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 30) {
+                TimerDisplay()
+
+                HStack(spacing: 20) {
+                    if timer.isRunning {
+                        Button("Stop") {
+                            timer.stop()
+                            appState.recordInteraction()
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.red)
+                    } else {
+                        Button("Start") {
+                            timer.start()
+                            appState.recordInteraction()
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.green)
+                    }
+
+                    Button("Reset") {
+                        timer.reset()
+                        appState.recordInteraction()
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(timer.seconds == 0)
+                }
+
+                Spacer()
+            }
+            .padding()
+            .navigationTitle("Timer")
+        }
+    }
+}
+
+struct TimerDisplay: View {
+    @EnvironmentObject var appState: AppState
+
+    private var timer: TimerState {
+        appState.timer
+    }
+
+    var body: some View {
+        WithObservationTracking {
+            VStack {
+                Text(formatTime(timer.seconds))
+                    .font(.system(size: 60, weight: .light, design: .monospaced))
+                    .foregroundColor(timer.isRunning ? .green : .primary)
+
+                Text(timer.isRunning ? "Running" : "Stopped")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private func formatTime(_ seconds: Int) -> String {
+        let minutes = seconds / 60
+        let remainingSeconds = seconds % 60
+        return String(format: "%02d:%02d", minutes, remainingSeconds)
+    }
+}
+
+@ObservationTracking
+struct SettingsTab: View {
+    @EnvironmentObject var appState: AppState
+
+    private var settings: SettingsState {
+        appState.settings
+    }
+
+    var body: some View {
+        NavigationView {
+            Form {
+                Section("Appearance") {
+                    Picker(
+                        "Theme",
+                        selection: Binding(
+                            get: { settings.theme },
+                            set: { settings.theme = $0 }
+                        )
+                    ) {
+                        ForEach(SettingsState.Theme.allCases, id: \.self) { theme in
+                            Text(theme.rawValue).tag(theme)
+                        }
+                    }
+                }
+
+                Section("Behavior") {
+                    Toggle(
+                        "Animations",
+                        isOn: Binding(
+                            get: { settings.animations },
+                            set: { settings.animations = $0 }
+                        ))
+
+                    Toggle(
+                        "Notifications",
+                        isOn: Binding(
+                            get: { settings.notifications },
+                            set: { settings.notifications = $0 }
+                        ))
+                }
+
+                Section("Statistics") {
+                    StatRowView(title: "Total Interactions", value: "\(appState.totalInteractions)")
+                    StatRowView(title: "Counter Value", value: "\(appState.counter.count)")
+                    StatRowView(title: "Timer Seconds", value: "\(appState.timer.seconds)")
+                }
+            }
+            .navigationTitle("Settings")
+        }
+    }
+}
+
+struct StatRowView: View {
+    let title: String
+    let value: String
+
+    var body: some View {
+        WithObservationTracking {
+            HStack {
+                Text(title)
+                Spacer()
+                Text(value)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+}

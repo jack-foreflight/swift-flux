@@ -8,6 +8,9 @@
       location = "group:Examples/CounterApp/CounterApp.xcodeproj">
    </FileRef>
    <FileRef
+      location = "group:Examples/TodoApp/TodoApp.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:../SwiftFlux.xctestplan">
    </FileRef>
 </Workspace>
