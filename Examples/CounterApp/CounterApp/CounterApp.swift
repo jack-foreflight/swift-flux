@@ -16,7 +16,7 @@
 import FluxObservation
 import SwiftUI
 
-// Helper extension for view styling (not related to observation)
+// Helper extension for easy visualization of View updates
 extension View {
     func randomBackground() -> some View {
         self.background(
@@ -53,7 +53,7 @@ public final class TimerState {
     // These properties automatically become observable when accessed in SwiftUI views
     public var seconds: Int = 0
     public var isRunning: Bool = false
-    
+
     // @ObservationIgnored could be used here to prevent observation of private properties
     private var timer: Timer?
 
@@ -167,18 +167,21 @@ struct MainTabView: View {
                     Image(systemName: "plus.circle.fill")
                     Text("Counter")
                 }
+                .randomBackground()
 
             TimerTab()
                 .tabItem {
                     Image(systemName: "timer")
                     Text("Timer")
                 }
+                .randomBackground()
 
             SettingsTab()
                 .tabItem {
                     Image(systemName: "gear")
                     Text("Settings")
                 }
+                .randomBackground()
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -187,6 +190,7 @@ struct MainTabView: View {
                 Text("Interactions: \(appState.totalInteractions)")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                    .randomBackground()
             }
         }
     }
@@ -275,6 +279,7 @@ struct CounterTab: View {
             }
             .padding()
             .navigationTitle("Counter")
+            .randomBackground()
         }
     }
 }
@@ -358,6 +363,7 @@ struct TimerTab: View {
             }
             .padding()
             .navigationTitle("Timer")
+            .randomBackground()
         }
     }
 }
