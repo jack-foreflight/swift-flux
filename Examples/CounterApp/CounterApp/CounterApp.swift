@@ -2,11 +2,21 @@
 //  CounterApp.swift
 //  CounterApp - SwiftFlux Example
 //
+//  This example demonstrates the FluxObservation framework usage patterns.
+//  FluxObservation backdeloys Apple's Observation framework to support earlier iOS versions.
+//
+//  Key demonstrations:
+//  - Observable state objects using @Observable macro (backdeployed from iOS 17+)
+//  - @ObservationTracking macro for automatic SwiftUI view updates (backdeployment feature)
+//  - WithObservationTracking view wrapper for manual observation tracking (backdeployment feature)
+//  - Environment injection of observable objects compatible with earlier iOS versions
+//  - Reactive UI updates based on state changes across iOS versions
 //
 
 import FluxObservation
 import SwiftUI
 
+// Helper extension for view styling (not related to observation)
 extension View {
     func randomBackground() -> some View {
         self.background(
@@ -21,28 +31,37 @@ extension View {
 
 @main
 struct CounterApp: App {
+    // Create the root observable state object
     @State private var appState = AppState()
 
     var body: some Scene {
         WindowGroup {
             NavigationStack {
                 MainTabView()
+                    // Inject the observable state into the environment using FluxObservation's
+                    // custom environment extension that works with earlier iOS versions
                     .environment(appState)
             }
         }
     }
 }
 
+// Example of @Observable macro usage - backdeployed from iOS 17+ Observation framework
+// The macro automatically generates observation infrastructure for earlier iOS versions
 @Observable
 public final class TimerState {
+    // These properties automatically become observable when accessed in SwiftUI views
     public var seconds: Int = 0
     public var isRunning: Bool = false
+    
+    // @ObservationIgnored could be used here to prevent observation of private properties
     private var timer: Timer?
 
     public func start() {
         guard !isRunning else { return }
         isRunning = true
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+            // Property mutations automatically trigger UI updates in observing views
             self.seconds += 1
         }
     }
@@ -61,10 +80,13 @@ public final class TimerState {
 
 @Observable
 public final class CounterState {
+    // Stored properties that will trigger UI updates when modified
     public var count: Int = 0
     public var step: Int = 1
     public var history: [Int] = []
 
+    // Computed properties that depend on observable stored properties
+    // These will automatically recompute when their dependencies change
     public var isEven: Bool {
         count % 2 == 0
     }
@@ -79,6 +101,7 @@ public final class CounterState {
         return true
     }
 
+    // Methods that modify observable state will trigger UI updates
     public func increment() {
         history.append(count)
         count += step
@@ -113,12 +136,15 @@ public final class SettingsState {
     }
 }
 
+// Root observable state object demonstrating composition of multiple observable objects
 @Observable
 public final class AppState {
+    // Nested observable objects maintain their reactivity
     public var counter = CounterState()
     public var timer = TimerState()
     public var settings = SettingsState()
 
+    // Global state that can be observed across the app
     public var totalInteractions: Int = 0
 
     public func recordInteraction() {
@@ -126,9 +152,13 @@ public final class AppState {
     }
 }
 
+// Example of @ObservationTracking macro usage - a backdeployment feature for automatic view updates
+// This macro generates observation tracking code that works on earlier iOS versions
+// It automatically wraps the view's body with observation tracking infrastructure
 @ObservationTracking
 struct MainTabView: View {
-    @EnvironmentObject var appState: AppState
+    // Using FluxObservation's custom Environment property wrapper for earlier iOS versions
+    @FluxObservation.Environment var appState: AppState
 
     var body: some View {
         TabView {
@@ -152,6 +182,8 @@ struct MainTabView: View {
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
+                // This text will automatically update when appState.totalInteractions changes
+                // thanks to the @ObservationTracking macro above
                 Text("Interactions: \(appState.totalInteractions)")
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -160,10 +192,14 @@ struct MainTabView: View {
     }
 }
 
+// Another example of @ObservationTracking macro for automatic observation
 @ObservationTracking
 struct CounterTab: View {
+    // This demonstrates mixing FluxObservation with standard @EnvironmentObject
+    // The @ObservationTracking macro ensures proper observation tracking
     @EnvironmentObject var appState: AppState
 
+    // Computed property access to nested observable state
     private var counter: CounterState {
         appState.counter
     }
@@ -243,6 +279,9 @@ struct CounterTab: View {
     }
 }
 
+// Example of manual observation tracking using WithObservationTracking view
+// This is useful when you want fine-grained control over what gets observed
+// or when you can't use the @ObservationTracking macro
 struct StepControlView: View {
     @EnvironmentObject var appState: AppState
 
@@ -251,8 +290,11 @@ struct StepControlView: View {
     }
 
     var body: some View {
+        // WithObservationTracking is a backdeployment utility view that manually wraps content
+        // with observation tracking. This is an alternative to the @ObservationTracking macro
         WithObservationTracking {
             VStack {
+                // This text will update when counter.step changes
                 Text("Step: \(counter.step)")
                     .font(.headline)
 
@@ -320,6 +362,7 @@ struct TimerTab: View {
     }
 }
 
+// Another example of WithObservationTracking for manual observation control
 struct TimerDisplay: View {
     @EnvironmentObject var appState: AppState
 
@@ -328,8 +371,10 @@ struct TimerDisplay: View {
     }
 
     var body: some View {
+        // Manual observation tracking allows this view to update when timer properties change
         WithObservationTracking {
             VStack {
+                // Both timer.seconds and timer.isRunning are automatically observed
                 Text(formatTime(timer.seconds))
                     .font(.system(size: 60, weight: .light, design: .monospaced))
                     .foregroundColor(timer.isRunning ? .green : .primary)
@@ -400,11 +445,14 @@ struct SettingsTab: View {
     }
 }
 
+// Final example showing WithObservationTracking for individual components
 struct StatRowView: View {
     let title: String
     let value: String
 
     var body: some View {
+        // Even small components can benefit from manual observation tracking
+        // This ensures the value updates when the underlying observable state changes
         WithObservationTracking {
             HStack {
                 Text(title)
